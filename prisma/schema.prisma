@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextIndex", "fullTextSearch"]
 }
 
 datasource db {
@@ -52,7 +53,7 @@ model localtion {
 
 model permission {
   id        Int         @id @default(autoincrement())
-  role      String      @db.Char(20)
+  role      String      @db.VarChar
   user_info user_info[]
 }
 
@@ -73,9 +74,14 @@ model user_info {
   id              Int               @id @default(autoincrement())
   name            String?
   emirates_id     String?
-  license_no      String?           @db.Char(16)
+  license_no      String?           @db.VarChar
   expiry_date     DateTime?         @db.Date
   permission_id   Int
+  email           String?           @db.VarChar
+  number_phone    String?           @db.VarChar
+  created_at      DateTime?         @db.Timestamp(6)
+  updated_at      DateTime?         @db.Timestamp(6)
+  password        String?
   blog            blog[]
   permission      permission        @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_language   user_language[]   @ignore
