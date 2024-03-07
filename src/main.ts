@@ -9,7 +9,8 @@ async function bootstrap() {
     .setTitle('BukGuide.com Documentation')
     .setDescription('The cats API description')
     .setVersion('1.0')
-    .addTag('Users')
+    .addTag('API Service')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

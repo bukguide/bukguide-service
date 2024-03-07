@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { UserCreateDto, UserUpdateDto } from '../dto/users.dto';
+import { UserCreateDto, UserLoginDto, UserUpdateDto } from '../dto/users.dto';
 import * as bcrypt from 'bcrypt';
-import { errorCode, successCode, successGetPage } from 'src/config/respone.service';
+import { errorCode, failCode, successCode, successGetPage } from 'src/config/respone.service';
 import { convertTsVector } from 'src/ultiService/ultiService';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 const prisma = new PrismaClient()
 
 @Injectable()
 export class UsersService {
+    constructor(private jwtService: JwtService, private config: ConfigService) { }
 
     async getUsers(keySearch: string, pageNumber: number, pageSize: number): Promise<any> {
         try {
@@ -79,7 +82,7 @@ export class UsersService {
                 include: { permission: true }
             })
             let { password, ...dataResult } = dataFind
-            return dataResult
+            return successCode(dataResult, "Successfully!")
         } catch (error) {
             return errorCode(error.message)
         }
@@ -91,6 +94,32 @@ export class UsersService {
                 where: { id },
             })
             return successCode({ id }, "User deleted successfully!")
+        } catch (error) {
+            return errorCode(error.message)
+        }
+    }
+
+    async login(userLogin: UserLoginDto) {
+        try {
+            let checkUser = await prisma.user_info.findFirst({
+                where: { email: userLogin.email },
+                include: { permission: true }
+            })
+            if (!checkUser) return failCode("Email not found!")
+
+            if (bcrypt.compareSync(userLogin.password, checkUser.password)) {
+                let { password, ...data } = { ...checkUser }
+                let token = this.jwtService.sign(
+                    { data: data },
+                    {
+                        expiresIn: '72h',
+                        secret: this.config.get('SECRET_KEY')
+                    }
+                )
+                return successCode({ token: token }, "Login successful!")
+            } else {
+                return failCode("Passwords incorrect!")
+            }
         } catch (error) {
             return errorCode(error.message)
         }

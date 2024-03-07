@@ -39,3 +39,9 @@ export class UserUpdateDto {
     @ApiProperty()
     number_phone: string;
 }
+export class UserLoginDto {
+    @ApiProperty()
+    email: string;
+    @ApiProperty()
+    password: string;
+}

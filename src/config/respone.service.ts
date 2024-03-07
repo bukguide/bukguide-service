@@ -35,4 +35,11 @@ const successGetPage = (data, pageCurrent, pageSize, countTotalData) => {
     }
 }
 
-export { successCode, failCode, errorCode, successGetPage }
+const unAuthor = () => {
+    return {
+        statusCode: 401,
+        content: "This account does not have sufficient access rights!"
+    }
+}
+
+export { successCode, failCode, errorCode, successGetPage, unAuthor }
