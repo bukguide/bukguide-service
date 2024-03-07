@@ -13,14 +13,27 @@ const prisma = new PrismaClient()
 export class UsersService {
     constructor(private jwtService: JwtService, private config: ConfigService) { }
 
-    async getUsers(keySearch: string, pageNumber: number, pageSize: number): Promise<any> {
+    async getUsers(keySearch: string, pageNumber: number, pageSize: number) {
         try {
             let data = await prisma.user_info.findMany({
                 where: {
                     OR: [
                         { name: { search: convertTsVector(keySearch) } },
+                        { name: { mode: 'insensitive', contains: keySearch, } },
                         { email: { mode: 'insensitive', contains: keySearch, } },
                     ]
+                },
+                include: {
+                    permission: true,
+                    user_language: {
+                        include: { language: true }
+                    },
+                    user_location: {
+                        include: { location: true }
+                    },
+                    user_type_toure: {
+                        include: { type_toure: true }
+                    }
                 },
                 skip: (pageNumber - 1) * pageSize,
                 take: pageSize
@@ -29,6 +42,7 @@ export class UsersService {
                 where: {
                     OR: [
                         { name: { search: convertTsVector(keySearch) } },
+                        { name: { mode: 'insensitive', contains: keySearch, } },
                         { email: { mode: 'insensitive', contains: keySearch, } },
                     ]
                 },
@@ -40,7 +54,7 @@ export class UsersService {
         }
     };
 
-    async signup(userInfo: UserCreateDto): Promise<any> {
+    async signup(userInfo: UserCreateDto) {
         // Check if user already exists
         let checkEmail = await prisma.user_info.findFirst({ where: { email: userInfo.email } })
         let checkEmirates_id = await prisma.user_info.findFirst({ where: { emirates_id: userInfo.emirates_id } })
@@ -53,11 +67,48 @@ export class UsersService {
         if (checkNumber_phone) return "Number phone already exists!"
 
         // HashSync user information
-        let dataUserInfo: any = { ...userInfo, password: bcrypt.hashSync(userInfo.password, 10), created_at: new Date(), updated_at: new Date() }
+        let { location_id, language_id, type_toure_id, ...dataUserInfo } = userInfo
+        let dataUserCreate: any = { ...dataUserInfo, password: bcrypt.hashSync(userInfo.password, 10), created_at: new Date(), updated_at: new Date() }
 
         try {
-            await prisma.user_info.create({ data: dataUserInfo })
-            return successCode({ username: dataUserInfo.name }, "User created successfully!")
+            let newUser = await prisma.user_info.create({ data: dataUserCreate })
+
+            // Create foreign key
+            if (userInfo.language_id) {
+                userInfo.language_id.map((el: any, idx: any) => {
+                    const findLanguage = async () => {
+                        let getLanguage = await prisma.language.findFirst({ where: { id: el } })
+                        if (getLanguage) await prisma.user_language.create({
+                            data: { language_id: el, user_id: newUser.id }
+                        })
+                    }
+                    findLanguage()
+                })
+            }
+            if (userInfo.location_id) {
+                userInfo.location_id.map((el: any, idx: any) => {
+                    const findLocation = async () => {
+                        let getLocation = await prisma.location.findFirst({ where: { id: el } })
+                        if (getLocation) await prisma.user_location.create({
+                            data: { location_id: el, user_id: newUser.id }
+                        })
+                    }
+                    findLocation()
+                })
+            }
+            if (userInfo.type_toure_id) {
+                userInfo.type_toure_id.map((el: any, idx: any) => {
+                    const findTypeToure = async () => {
+                        let getTypeToure = await prisma.type_toure.findFirst({ where: { id: el } })
+                        if (getTypeToure) await prisma.user_type_toure.create({
+                            data: { type_toure_id: el, user_id: newUser.id }
+                        })
+                    }
+                    findTypeToure()
+                })
+            }
+
+            return successCode({ userName: newUser.name }, "User created successfully!")
         } catch (error) {
             return errorCode(error.message)
         }
@@ -69,6 +120,7 @@ export class UsersService {
                 where: { id },
                 data: { ...userInfo, updated_at: new Date() }
             })
+
             return successCode({ username: userInfo.name }, "User updated successfully!")
         } catch (error) {
             return errorCode(error.message)
@@ -79,7 +131,18 @@ export class UsersService {
         try {
             let dataFind = await prisma.user_info.findFirst({
                 where: { id },
-                include: { permission: true }
+                include: {
+                    permission: true,
+                    user_language: {
+                        include: { language: true }
+                    },
+                    user_location: {
+                        include: { location: true }
+                    },
+                    user_type_toure: {
+                        include: { type_toure: true }
+                    }
+                }
             })
             let { password, ...dataResult } = dataFind
             return successCode(dataResult, "Successfully!")

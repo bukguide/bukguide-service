@@ -3,6 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { LanguageModule } from './categories/language/language.module';
+import { LocationModule } from './categories/location/location.module';
+import { TypeToureModule } from './categories/type-toure/type-toure.module';
+import { TagModule } from './categories/tag/tag.module';
 
 @Module({
   imports: [
@@ -10,6 +14,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       isGlobal: true,
     }),
     UsersModule,
+    LanguageModule,
+    LocationModule,
+    TypeToureModule,
+    TagModule,
   ],
   controllers: [AppController],
   providers: [AppService],

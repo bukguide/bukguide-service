@@ -15,40 +15,36 @@ model blog {
   key_word        String?
   user_id         Int
   user_info       user_info         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  blog_tag        blog_tag[]        @ignore
-  blog_type_toure blog_type_toure[] @ignore
+  blog_tag        blog_tag[]
+  blog_type_toure blog_type_toure[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model blog_tag {
   blog_id Int
   tag_id  Int
+  id      Int  @id @default(autoincrement())
   blog    blog @relation(fields: [blog_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   tag     tag  @relation(fields: [tag_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model blog_type_toure {
   blog_id       Int
   type_toure_id Int
+  id            Int        @id @default(autoincrement()) @db.SmallInt
   blog          blog       @relation(fields: [blog_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   type_toure    type_toure @relation(fields: [type_toure_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@ignore
 }
 
 model language {
   id            Int             @id @default(autoincrement())
-  name          Int
-  user_language user_language[] @ignore
+  name          String
+  user_language user_language[]
 }
 
-model localtion {
-  id            Int             @id @default(autoincrement())
+model location {
+  id            Int             @id(map: "localtion_pkey") @default(autoincrement())
   name          String
-  user_location user_location[] @ignore
+  user_location user_location[]
 }
 
 model permission {
@@ -60,14 +56,14 @@ model permission {
 model tag {
   id       Int        @id @default(autoincrement())
   name     String
-  blog_tag blog_tag[] @ignore
+  blog_tag blog_tag[]
 }
 
 model type_toure {
   id              Int               @id @default(autoincrement())
-  name            Int
-  blog_type_toure blog_type_toure[] @ignore
-  user_type_toure user_type_toure[] @ignore
+  name            String
+  blog_type_toure blog_type_toure[]
+  user_type_toure user_type_toure[]
 }
 
 model user_info {
@@ -84,37 +80,31 @@ model user_info {
   password        String?
   blog            blog[]
   permission      permission        @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user_language   user_language[]   @ignore
-  user_location   user_location[]   @ignore
-  user_type_toure user_type_toure[] @ignore
+  user_language   user_language[]
+  user_location   user_location[]
+  user_type_toure user_type_toure[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model user_language {
   user_id     Int
   language_id Int
+  id          Int       @id @default(autoincrement())
   language    language  @relation(fields: [language_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_info   user_info @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model user_location {
   user_id     Int
   location_id Int
-  localtion   localtion @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id          Int       @id @default(autoincrement())
+  location    location  @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_info   user_info @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@ignore
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model user_type_toure {
   user_id       Int
   type_toure_id Int
+  id            Int        @id @default(autoincrement())
   type_toure    type_toure @relation(fields: [type_toure_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_info     user_info  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@ignore
 }

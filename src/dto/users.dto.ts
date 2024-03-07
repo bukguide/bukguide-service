@@ -19,6 +19,12 @@ export class UserCreateDto {
     number_phone: string;
     @ApiProperty()
     password: string;
+    @ApiProperty({ required: false })
+    language_id: number[];
+    @ApiProperty({ required: false })
+    location_id: number[];
+    @ApiProperty({ required: false })
+    type_toure_id: number[];
 
     created_at: Date;
     updated_at: Date;
@@ -38,6 +44,12 @@ export class UserUpdateDto {
     email: string;
     @ApiProperty()
     number_phone: string;
+    @ApiProperty({ required: false })
+    language_id: number[];
+    @ApiProperty({ required: false })
+    location_id: number[];
+    @ApiProperty({ required: false })
+    type_toure_id: number[];
 }
 export class UserLoginDto {
     @ApiProperty()

@@ -4,7 +4,7 @@ import { UserCreateDto, UserLoginDto, UserUpdateDto } from '../dto/users.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { checkPermission } from 'src/ultiService/ultiService';
-import { failCode, unAuthor } from 'src/config/respone.service';
+import { unAuthor } from 'src/config/respone.service';
 
 @ApiTags("UsersService")
 @Controller('users')
