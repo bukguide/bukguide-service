@@ -78,6 +78,7 @@ model user_info {
   created_at      DateTime?         @db.Timestamp(6)
   updated_at      DateTime?         @db.Timestamp(6)
   password        String?
+  approve         Boolean?
   blog            blog[]
   permission      permission        @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_language   user_language[]
