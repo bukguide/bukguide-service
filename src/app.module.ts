@@ -8,6 +8,7 @@ import { LocationModule } from './categories/location/location.module';
 import { TypeToureModule } from './categories/type-toure/type-toure.module';
 import { TagModule } from './categories/tag/tag.module';
 import { BlogModule } from './blog/blog.module';
+import { PermissionModule } from './categories/permission/permission.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { BlogModule } from './blog/blog.module';
     TypeToureModule,
     TagModule,
     BlogModule,
+    PermissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
