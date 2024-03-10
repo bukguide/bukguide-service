@@ -20,17 +20,21 @@ export class UsersService {
         permission_id: number,
         language_id: number[],
         location_id: number[],
-        type_toure_id: number[]) {
+        type_toure_id: number[],
+        expertise_id: number[],
+    ) {
         try {
             let findLanguage = await prisma.user_language.findMany({ where: { language_id: { in: language_id } } })
             let findLocation = await prisma.user_location.findMany({ where: { location_id: { in: location_id } } })
             let findTypeToure = await prisma.user_type_toure.findMany({ where: { type_toure_id: { in: type_toure_id } } })
+            let findExpertise = await prisma.user_expertise.findMany({ where: { expertise_id: { in: expertise_id } } })
 
             const generateAndCondition = () => {
                 const conditions = [];
                 if (findLanguage && findLanguage?.length > 0) conditions.push({ id: { in: findLanguage.map(el => el.user_id) } },)
                 if (findLocation && findLocation?.length > 0) conditions.push({ id: { in: findLocation.map(el => el.user_id) } },)
                 if (findTypeToure && findTypeToure?.length > 0) conditions.push({ id: { in: findTypeToure.map(el => el.user_id) } },)
+                if (findExpertise && findExpertise?.length > 0) conditions.push({ id: { in: findExpertise.map(el => el.user_id) } },)
                 if (permission_id) conditions.push({ permission_id },)
                 approve === "true" ? conditions.push({ approve: true }) : conditions.push({ approve: false })
                 return conditions
@@ -136,6 +140,17 @@ export class UsersService {
                     findTypeToure()
                 })
             }
+            if (userInfo.expertise_id) {
+                userInfo.expertise_id.map((el: any, idx: any) => {
+                    const findExpertise = async () => {
+                        let getExpertise = await prisma.expertise.findFirst({ where: { id: el } })
+                        if (getExpertise) await prisma.user_expertise.create({
+                            data: { expertise_id: el, user_id: newUser.id }
+                        })
+                    }
+                    findExpertise()
+                })
+            }
 
             return successCode({ userName: newUser.name }, "User created successfully!")
         } catch (error) {
@@ -214,6 +229,27 @@ export class UsersService {
                         })
                     }
                     findTypeToure()
+                })
+            }
+            if (userInfo?.expertise_id && userInfo?.expertise_id?.length > 0) {
+                let getUserExpertise = await prisma.user_expertise.findMany({
+                    where: { user_id: id }
+                })
+                if (getUserExpertise) await getUserExpertise?.map(el => {
+                    const deleteUserExpertise = async () => {
+                        await prisma.user_expertise.delete({ where: { id: el.id } })
+                    }
+                    deleteUserExpertise()
+                })
+
+                await userInfo.expertise_id.map((el: any, idx: any) => {
+                    const findExpertise = async () => {
+                        let getExpertise = await prisma.expertise.findFirst({ where: { id: el } })
+                        if (getExpertise) await prisma.user_expertise.create({
+                            data: { expertise_id: el, user_id: id }
+                        })
+                    }
+                    findExpertise()
                 })
             }
 
@@ -311,6 +347,15 @@ export class UsersService {
                     await prisma.user_type_toure.delete({ where: { id: el.id } })
                 }
                 deleteUserTypeToure()
+            })
+            let getUserExpertise = await prisma.user_expertise.findMany({
+                where: { user_id: id }
+            })
+            if (getUserExpertise) await getUserExpertise?.map(el => {
+                const deleteUserExpertise = async () => {
+                    await prisma.user_expertise.delete({ where: { id: el.id } })
+                }
+                deleteUserExpertise()
             })
             return successCode({ id }, "User deleted successfully!")
         } catch (error) {

@@ -35,6 +35,7 @@ export class UsersController {
         @Query("language_id") language_id: number[],
         @Query("location_id") location_id: number[],
         @Query("type_toure_id") type_toure_id: number[],
+        @Query("expertise_id") expertise_id: number[],
         @Req() req) {
         try {
             if (!checkPermission(req, ["admin"])) return unAuthor()
@@ -46,7 +47,8 @@ export class UsersController {
                 permission_id * 1,
                 language_id ? JSON.parse(language_id.toString()) : [],
                 location_id ? JSON.parse(location_id.toString()) : [],
-                type_toure_id ? JSON.parse(type_toure_id.toString()) : []
+                type_toure_id ? JSON.parse(type_toure_id.toString()) : [],
+                expertise_id ? JSON.parse(expertise_id.toString()) : [],
             )
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)

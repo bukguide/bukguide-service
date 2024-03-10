@@ -9,6 +9,7 @@ import { TypeToureModule } from './categories/type-toure/type-toure.module';
 import { TagModule } from './categories/tag/tag.module';
 import { BlogModule } from './blog/blog.module';
 import { PermissionModule } from './categories/permission/permission.module';
+import { ExpertiseModule } from './categories/expertise/expertise.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { PermissionModule } from './categories/permission/permission.module';
     TagModule,
     BlogModule,
     PermissionModule,
+    ExpertiseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

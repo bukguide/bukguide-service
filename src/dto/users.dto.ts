@@ -25,6 +25,8 @@ export class UserCreateDto {
     location_id: number[];
     @ApiProperty({ required: false })
     type_toure_id: number[];
+    @ApiProperty({ required: false })
+    expertise_id: number[];
 
     created_at: Date;
     updated_at: Date;
@@ -50,6 +52,8 @@ export class UserUpdateDto {
     location_id: number[];
     @ApiProperty({ required: false })
     type_toure_id: number[];
+    @ApiProperty({ required: false })
+    expertise_id: number[];
 }
 export class UserLoginDto {
     @ApiProperty()

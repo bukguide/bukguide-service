@@ -35,6 +35,12 @@ model blog_type_toure {
   type_toure    type_toure @relation(fields: [type_toure_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
+model expertise {
+  id             Int              @id @default(autoincrement())
+  name           String
+  user_expertise user_expertise[]
+}
+
 model language {
   id            Int             @id @default(autoincrement())
   name          String
@@ -66,6 +72,14 @@ model type_toure {
   user_type_toure user_type_toure[]
 }
 
+model user_expertise {
+  id           Int       @id @default(autoincrement())
+  expertise_id Int
+  user_id      Int
+  expertise    expertise @relation(fields: [expertise_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_info    user_info @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
 model user_info {
   id              Int               @id @default(autoincrement())
   name            String?
@@ -80,6 +94,7 @@ model user_info {
   password        String?
   approve         Boolean?
   blog            blog[]
+  user_expertise  user_expertise[]
   permission      permission        @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_language   user_language[]
   user_location   user_location[]
