@@ -159,7 +159,7 @@ export class UsersService {
     }
 
     async update(userInfo: UserUpdateDto, id: number) {
-        let { language_id, location_id, type_toure_id, ...userUpdate } = userInfo
+        let { language_id, location_id, type_toure_id, expertise_id, ...userUpdate } = userInfo
 
         try {
             await prisma.user_info.update({
@@ -303,7 +303,10 @@ export class UsersService {
                     },
                     user_type_toure: {
                         include: { type_toure: true }
-                    }
+                    },
+                    user_expertise: {
+                        include: { expertise: true }
+                    },
                 }
             })
             let { password, ...dataResult } = dataFind

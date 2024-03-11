@@ -114,6 +114,7 @@ export class UsersController {
     delete(@Query("id") id: string, @Req() req) {
         try {
             if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
+            if (req.user.data.id != id && req.user.data.permission.role != "admin") return unAuthor()
             return this.UsersService.delete(parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)

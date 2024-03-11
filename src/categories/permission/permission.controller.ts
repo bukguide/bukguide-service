@@ -18,7 +18,7 @@ export class PermissionController {
     @Get('get-option')
     getOption(@Req() req) {
         try {
-            if (!checkPermission(req, ["admin"])) return unAuthor()
+            if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
             return this.PermissionService.getOption()
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
