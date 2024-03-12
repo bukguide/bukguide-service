@@ -7,14 +7,14 @@ import { unAuthor } from 'src/config/respone.service';
 import { LanguageCreateDto, LanguageUpdateDto } from 'src/dto/language.dto';
 
 @ApiTags("LanguageService")
-@ApiBearerAuth()
-@UseGuards(AuthGuard("jwt"))
 @Controller('language')
 export class LanguageController {
     constructor(
         private readonly LanguageService: LanguageService
     ) { }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Get('get')
     get(@Query("keySearch") keySearch: string, @Query("pageNumber") pageNumber: string, @Query("pageSize") pageSize: string, @Req() req) {
@@ -26,6 +26,8 @@ export class LanguageController {
         }
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Get('get-id')
     getOne(@Query("id") id: string, @Req() req) {
@@ -41,13 +43,15 @@ export class LanguageController {
     @Get('get-option')
     getOption(@Req() req) {
         try {
-            if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
+            // if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
             return this.LanguageService.getOption()
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Post('create')
     create(@Body() dataCreate: LanguageCreateDto, @Req() req) {
@@ -59,6 +63,8 @@ export class LanguageController {
         }
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Post('update/:id')
     update(@Body() dataUpdate: LanguageUpdateDto, @Param("id") id: string, @Req() req) {
@@ -70,6 +76,8 @@ export class LanguageController {
         }
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Delete('delete')
     delete(@Query("id") id: string, @Req() req) {

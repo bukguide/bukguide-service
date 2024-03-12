@@ -7,14 +7,14 @@ import { unAuthor } from 'src/config/respone.service';
 import { LocationCreateDto, LocationUpdateDto } from 'src/dto/location.dto';
 
 @ApiTags("LocationService")
-@ApiBearerAuth()
-@UseGuards(AuthGuard("jwt"))
 @Controller('location')
 export class LocationController {
     constructor(
         private readonly LocationService: LocationService
     ) { }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Get('get')
     get(@Query("keySearch") keySearch: string, @Query("pageNumber") pageNumber: string, @Query("pageSize") pageSize: string, @Req() req) {
@@ -26,6 +26,8 @@ export class LocationController {
         }
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Get('get-id')
     getOne(@Query("id") id: string, @Req() req) {
@@ -41,13 +43,15 @@ export class LocationController {
     @Get('get-option')
     getOption(@Req() req) {
         try {
-            if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
+            // if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
             return this.LocationService.getOption()
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Post('create')
     create(@Body() dataCreate: LocationCreateDto, @Req() req) {
@@ -59,6 +63,8 @@ export class LocationController {
         }
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Post('update/:id')
     update(@Body() dataUpdate: LocationUpdateDto, @Param("id") id: string, @Req() req) {
@@ -70,6 +76,8 @@ export class LocationController {
         }
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Delete('delete')
     delete(@Query("id") id: string, @Req() req) {

@@ -82,19 +82,25 @@ export class UsersService {
     };
 
     async signup(userInfo: UserCreateDto) {
+        // Check param
+        if (!userInfo.email) return failCode("Email not provided")
+        if (!userInfo.name) return failCode("Name not provided")
+        if (!userInfo.password) return failCode("Password not provided")
+        if (!userInfo.permission_id) return failCode("Permission_id not provided")
+
         // Check if user already exists
         let checkEmail = await prisma.user_info.findFirst({ where: { email: userInfo.email } })
         let checkEmirates_id = await prisma.user_info.findFirst({ where: { emirates_id: userInfo.emirates_id } })
         let checkLicense_no = await prisma.user_info.findFirst({ where: { license_no: userInfo.license_no } })
         let checkNumber_phone = await prisma.user_info.findFirst({ where: { number_phone: userInfo.number_phone } })
 
-        if (checkEmail) return "Email already exists!"
-        if (checkEmirates_id) return "Emirates id already exists!"
-        if (checkLicense_no) return "License no already exists!"
-        if (checkNumber_phone) return "Number phone already exists!"
+        if (checkEmail) return failCode("Email already exists!")
+        if (checkEmirates_id) return failCode("Emirates id already exists!")
+        if (checkLicense_no) return failCode("License no already exists!")
+        if (checkNumber_phone) return failCode("Number phone already exists!")
 
         // HashSync user information
-        let { location_id, language_id, type_toure_id, ...dataUserInfo } = userInfo
+        let { location_id, language_id, type_toure_id, expertise_id, ...dataUserInfo } = userInfo
         let dataUserCreate: any = {
             ...dataUserInfo,
             password: bcrypt.hashSync(userInfo.password, 10),
@@ -168,7 +174,7 @@ export class UsersService {
             })
 
             // Update foreign key
-            if (userInfo?.language_id && userInfo?.language_id?.length > 0) {
+            if (userInfo?.language_id /*&& userInfo?.language_id?.length > 0*/) {
                 let getUserLanguage = await prisma.user_language.findMany({
                     where: { user_id: id }
                 })
@@ -189,7 +195,7 @@ export class UsersService {
                     findLanguage()
                 })
             }
-            if (userInfo?.location_id && userInfo?.location_id?.length > 0) {
+            if (userInfo?.location_id /*&& userInfo?.location_id?.length > 0*/) {
                 let getUserLocation = await prisma.user_location.findMany({
                     where: { user_id: id }
                 })
@@ -210,7 +216,7 @@ export class UsersService {
                     findLocation()
                 })
             }
-            if (userInfo?.type_toure_id && userInfo?.type_toure_id?.length > 0) {
+            if (userInfo?.type_toure_id /*&& userInfo?.type_toure_id?.length > 0*/) {
                 let getUserTypeToure = await prisma.user_type_toure.findMany({
                     where: { user_id: id }
                 })
@@ -231,7 +237,7 @@ export class UsersService {
                     findTypeToure()
                 })
             }
-            if (userInfo?.expertise_id && userInfo?.expertise_id?.length > 0) {
+            if (userInfo?.expertise_id /*&& userInfo?.expertise_id?.length > 0*/) {
                 let getUserExpertise = await prisma.user_expertise.findMany({
                     where: { user_id: id }
                 })
@@ -373,6 +379,7 @@ export class UsersService {
                 include: { permission: true }
             })
             if (!checkUser) return failCode("Email not found!")
+            if (!checkUser.approve) return failCode("Your account has not been approved, please wait for the moderation email")
 
             if (bcrypt.compareSync(userLogin.password, checkUser.password)) {
                 let { password, ...data } = { ...checkUser }

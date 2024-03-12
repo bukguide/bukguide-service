@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { errorCode, successCode, successGetPage } from 'src/config/respone.service';
+import { errorCode, failCode, successCode, successGetPage } from 'src/config/respone.service';
 import { BlogCreateDto, BlogUpdateDto } from 'src/dto/blog.dto';
 import { convertTsVector } from 'src/ultiService/ultiService';
 
@@ -10,6 +10,7 @@ const prisma = new PrismaClient()
 export class BlogService {
 
     async create(blogData: BlogCreateDto) {
+        if (!blogData.title || blogData.title === "" || blogData.title?.length == 0) return failCode("Post must have a title!")
         let { tag_id, type_toure_id, ...dataBlogCreate } = blogData
 
         try {
@@ -49,6 +50,14 @@ export class BlogService {
         try {
             let dataFind = await prisma.blog.findFirst({
                 where: { id },
+                include: {
+                    blog_tag: {
+                        include: { tag: true }
+                    },
+                    blog_type_toure: {
+                        include: { type_toure: true }
+                    }
+                },
             })
             return successCode(dataFind, "Successfully!")
         } catch (error) {
@@ -57,6 +66,8 @@ export class BlogService {
     }
 
     async update(blogInfo: BlogUpdateDto, id: number) {
+        if (!blogInfo.title || blogInfo.title === "") return failCode("Post must have a title!")
+
         let { tag_id, type_toure_id, ...blogUpdate } = blogInfo
 
         try {

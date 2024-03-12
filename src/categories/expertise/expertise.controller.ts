@@ -7,14 +7,14 @@ import { unAuthor } from 'src/config/respone.service';
 import { ExpertiseCreateDto, ExpertiseUpdateDto } from 'src/dto/expertise.dto';
 
 @ApiTags("ExpertiseService")
-@ApiBearerAuth()
-@UseGuards(AuthGuard("jwt"))
 @Controller('expertise')
 export class ExpertiseController {
     constructor(
         private readonly ExpertiseService: ExpertiseService
     ) { }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Get('get')
     get(@Query("keySearch") keySearch: string, @Query("pageNumber") pageNumber: string, @Query("pageSize") pageSize: string, @Req() req) {
@@ -26,6 +26,8 @@ export class ExpertiseController {
         }
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Get('get-id')
     getOne(@Query("id") id: string, @Req() req) {
@@ -41,13 +43,15 @@ export class ExpertiseController {
     @Get('get-option')
     getOption(@Req() req) {
         try {
-            if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
+            // if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
             return this.ExpertiseService.getOption()
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Post('create')
     create(@Body() dataCreate: ExpertiseCreateDto, @Req() req) {
@@ -59,6 +63,8 @@ export class ExpertiseController {
         }
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Post('update/:id')
     update(@Body() dataUpdate: ExpertiseUpdateDto, @Param("id") id: string, @Req() req) {
@@ -70,6 +76,8 @@ export class ExpertiseController {
         }
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Delete('delete')
     delete(@Query("id") id: string, @Req() req) {
