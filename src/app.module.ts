@@ -5,11 +5,11 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LanguageModule } from './categories/language/language.module';
 import { LocationModule } from './categories/location/location.module';
-import { TypeToureModule } from './categories/type-toure/type-toure.module';
 import { TagModule } from './categories/tag/tag.module';
 import { BlogModule } from './blog/blog.module';
 import { PermissionModule } from './categories/permission/permission.module';
 import { ExpertiseModule } from './categories/expertise/expertise.module';
+import { TypeTourModule } from './categories/type-toure/type-tour.module';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { ExpertiseModule } from './categories/expertise/expertise.module';
     UsersModule,
     LanguageModule,
     LocationModule,
-    TypeToureModule,
+    TypeTourModule,
     TagModule,
     BlogModule,
     PermissionModule,

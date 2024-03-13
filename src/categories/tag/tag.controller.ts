@@ -43,7 +43,7 @@ export class TagController {
     @Get('get-option')
     getOption(@Req() req) {
         try {
-            // if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
+            // if (!checkPermission(req, ["admin", "Tourguide"])) return unAuthor()
             return this.TagService.getOption()
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)

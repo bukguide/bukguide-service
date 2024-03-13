@@ -1,11 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class TypeToureCreateDto {
+export class TypeTourCreateDto {
     @ApiProperty()
     name: string;
 }
 
-export class TypeToureUpdateDto {
+export class TypeTourUpdateDto {
     @ApiProperty()
     name: string;
 }

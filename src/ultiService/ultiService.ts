@@ -1,5 +1,5 @@
 const convertTsVector = (inputValue: string) => {
-    return inputValue.replace(" ", " | ")
+    return inputValue.replace(/\s/g, ' | ')
 }
 
 const checkPermission = (req: any, role: string[]) => {

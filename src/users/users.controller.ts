@@ -34,7 +34,7 @@ export class UsersController {
         @Query("permission_id") permission_id: number,
         @Query("language_id") language_id: number[],
         @Query("location_id") location_id: number[],
-        @Query("type_toure_id") type_toure_id: number[],
+        @Query("type_tour_id") type_tour_id: number[],
         @Query("expertise_id") expertise_id: number[],
         @Req() req) {
         try {
@@ -47,7 +47,7 @@ export class UsersController {
                 permission_id * 1,
                 language_id ? JSON.parse(language_id.toString()) : [],
                 location_id ? JSON.parse(location_id.toString()) : [],
-                type_toure_id ? JSON.parse(type_toure_id.toString()) : [],
+                type_tour_id ? JSON.parse(type_tour_id.toString()) : [],
                 expertise_id ? JSON.parse(expertise_id.toString()) : [],
             )
         } catch (error) {
@@ -61,7 +61,7 @@ export class UsersController {
     @Post("update/:id")
     update(@Body() UserInfo: UserUpdateDto, @Param("id") id: string, @Req() req) {
         try {
-            if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
+            if (!checkPermission(req, ["admin", "Tourguide"])) return unAuthor()
             return this.UsersService.update(UserInfo, parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -74,7 +74,7 @@ export class UsersController {
     @Post("approve/:id")
     approve(@Param("id") id: string, @Req() req) {
         try {
-            if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
+            if (!checkPermission(req, ["admin", "Tourguide"])) return unAuthor()
             return this.UsersService.approve(parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -87,7 +87,7 @@ export class UsersController {
     @Post("un-approve/:id")
     unApprove(@Param("id") id: string, @Req() req) {
         try {
-            if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
+            if (!checkPermission(req, ["admin", "Tourguide"])) return unAuthor()
             return this.UsersService.unApprove(parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -100,7 +100,7 @@ export class UsersController {
     @Get('get-id')
     getOne(@Query("id") id: string, @Req() req) {
         try {
-            if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
+            if (!checkPermission(req, ["admin", "Tourguide"])) return unAuthor()
             return this.UsersService.getOne(parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -113,7 +113,7 @@ export class UsersController {
     @Delete('delete')
     delete(@Query("id") id: string, @Req() req) {
         try {
-            if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
+            if (!checkPermission(req, ["admin", "Tourguide"])) return unAuthor()
             if (req.user.data.id != id && req.user.data.permission.role != "admin") return unAuthor()
             return this.UsersService.delete(parseInt(id))
         } catch (error) {

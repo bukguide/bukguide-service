@@ -20,20 +20,20 @@ export class UsersService {
         permission_id: number,
         language_id: number[],
         location_id: number[],
-        type_toure_id: number[],
+        type_tour_id: number[],
         expertise_id: number[],
     ) {
         try {
             let findLanguage = await prisma.user_language.findMany({ where: { language_id: { in: language_id } } })
             let findLocation = await prisma.user_location.findMany({ where: { location_id: { in: location_id } } })
-            let findTypeToure = await prisma.user_type_toure.findMany({ where: { type_toure_id: { in: type_toure_id } } })
+            let findTypeTour = await prisma.user_type_tour.findMany({ where: { type_tour_id: { in: type_tour_id } } })
             let findExpertise = await prisma.user_expertise.findMany({ where: { expertise_id: { in: expertise_id } } })
 
             const generateAndCondition = () => {
                 const conditions = [];
                 if (findLanguage && findLanguage?.length > 0) conditions.push({ id: { in: findLanguage.map(el => el.user_id) } },)
                 if (findLocation && findLocation?.length > 0) conditions.push({ id: { in: findLocation.map(el => el.user_id) } },)
-                if (findTypeToure && findTypeToure?.length > 0) conditions.push({ id: { in: findTypeToure.map(el => el.user_id) } },)
+                if (findTypeTour && findTypeTour?.length > 0) conditions.push({ id: { in: findTypeTour.map(el => el.user_id) } },)
                 if (findExpertise && findExpertise?.length > 0) conditions.push({ id: { in: findExpertise.map(el => el.user_id) } },)
                 if (permission_id) conditions.push({ permission_id },)
                 approve === "true" ? conditions.push({ approve: true }) : conditions.push({ approve: false })
@@ -57,8 +57,8 @@ export class UsersService {
                     user_location: {
                         include: { location: true }
                     },
-                    user_type_toure: {
-                        include: { type_toure: true }
+                    user_type_tour: {
+                        include: { type_tour: true }
                     }
                 },
                 skip: (pageNumber - 1) * pageSize,
@@ -100,7 +100,7 @@ export class UsersService {
         if (checkNumber_phone) return failCode("Number phone already exists!")
 
         // HashSync user information
-        let { location_id, language_id, type_toure_id, expertise_id, ...dataUserInfo } = userInfo
+        let { location_id, language_id, type_tour_id, expertise_id, ...dataUserInfo } = userInfo
         let dataUserCreate: any = {
             ...dataUserInfo,
             password: bcrypt.hashSync(userInfo.password, 10),
@@ -135,15 +135,15 @@ export class UsersService {
                     findLocation()
                 })
             }
-            if (userInfo.type_toure_id) {
-                userInfo.type_toure_id.map((el: any, idx: any) => {
-                    const findTypeToure = async () => {
-                        let getTypeToure = await prisma.type_toure.findFirst({ where: { id: el } })
-                        if (getTypeToure) await prisma.user_type_toure.create({
-                            data: { type_toure_id: el, user_id: newUser.id }
+            if (userInfo.type_tour_id) {
+                userInfo.type_tour_id.map((el: any, idx: any) => {
+                    const findTypeTour = async () => {
+                        let getTypeTour = await prisma.type_tour.findFirst({ where: { id: el } })
+                        if (getTypeTour) await prisma.user_type_tour.create({
+                            data: { type_tour_id: el, user_id: newUser.id }
                         })
                     }
-                    findTypeToure()
+                    findTypeTour()
                 })
             }
             if (userInfo.expertise_id) {
@@ -165,7 +165,7 @@ export class UsersService {
     }
 
     async update(userInfo: UserUpdateDto, id: number) {
-        let { language_id, location_id, type_toure_id, expertise_id, ...userUpdate } = userInfo
+        let { language_id, location_id, type_tour_id, expertise_id, ...userUpdate } = userInfo
 
         try {
             await prisma.user_info.update({
@@ -216,25 +216,25 @@ export class UsersService {
                     findLocation()
                 })
             }
-            if (userInfo?.type_toure_id /*&& userInfo?.type_toure_id?.length > 0*/) {
-                let getUserTypeToure = await prisma.user_type_toure.findMany({
+            if (userInfo?.type_tour_id /*&& userInfo?.type_tour_id?.length > 0*/) {
+                let getUserTypeTour = await prisma.user_type_tour.findMany({
                     where: { user_id: id }
                 })
-                if (getUserTypeToure) await getUserTypeToure?.map(el => {
-                    const deleteUserTypeToure = async () => {
-                        await prisma.user_type_toure.delete({ where: { id: el.id } })
+                if (getUserTypeTour) await getUserTypeTour?.map(el => {
+                    const deleteUserTypeTour = async () => {
+                        await prisma.user_type_tour.delete({ where: { id: el.id } })
                     }
-                    deleteUserTypeToure()
+                    deleteUserTypeTour()
                 })
 
-                await userInfo.type_toure_id.map((el: any, idx: any) => {
-                    const findTypeToure = async () => {
-                        let getTypeToure = await prisma.type_toure.findFirst({ where: { id: el } })
-                        if (getTypeToure) await prisma.user_type_toure.create({
-                            data: { type_toure_id: el, user_id: id }
+                await userInfo.type_tour_id.map((el: any, idx: any) => {
+                    const findTypeTour = async () => {
+                        let getTypeTour = await prisma.type_tour.findFirst({ where: { id: el } })
+                        if (getTypeTour) await prisma.user_type_tour.create({
+                            data: { type_tour_id: el, user_id: id }
                         })
                     }
-                    findTypeToure()
+                    findTypeTour()
                 })
             }
             if (userInfo?.expertise_id /*&& userInfo?.expertise_id?.length > 0*/) {
@@ -307,8 +307,8 @@ export class UsersService {
                     user_location: {
                         include: { location: true }
                     },
-                    user_type_toure: {
-                        include: { type_toure: true }
+                    user_type_tour: {
+                        include: { type_tour: true }
                     },
                     user_expertise: {
                         include: { expertise: true }
@@ -324,10 +324,6 @@ export class UsersService {
 
     async delete(id: number) {
         try {
-            await prisma.user_info.delete({
-                where: { id },
-            })
-
             let getUserLocation = await prisma.user_location.findMany({
                 where: { user_id: id }
             })
@@ -348,14 +344,14 @@ export class UsersService {
                 deleteUserLanguage()
             })
 
-            let getUserTypeToure = await prisma.user_type_toure.findMany({
+            let getUserTypeTour = await prisma.user_type_tour.findMany({
                 where: { user_id: id }
             })
-            if (getUserTypeToure) await getUserTypeToure?.map(el => {
-                const deleteUserTypeToure = async () => {
-                    await prisma.user_type_toure.delete({ where: { id: el.id } })
+            if (getUserTypeTour) await getUserTypeTour?.map(el => {
+                const deleteUserTypeTour = async () => {
+                    await prisma.user_type_tour.delete({ where: { id: el.id } })
                 }
-                deleteUserTypeToure()
+                deleteUserTypeTour()
             })
             let getUserExpertise = await prisma.user_expertise.findMany({
                 where: { user_id: id }
@@ -365,6 +361,10 @@ export class UsersService {
                     await prisma.user_expertise.delete({ where: { id: el.id } })
                 }
                 deleteUserExpertise()
+            })
+
+            await prisma.user_info.delete({
+                where: { id },
             })
             return successCode({ id }, "User deleted successfully!")
         } catch (error) {

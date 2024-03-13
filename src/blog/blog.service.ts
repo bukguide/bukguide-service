@@ -11,10 +11,10 @@ export class BlogService {
 
     async create(blogData: BlogCreateDto) {
         if (!blogData.title || blogData.title === "" || blogData.title?.length == 0) return failCode("Post must have a title!")
-        let { tag_id, type_toure_id, ...dataBlogCreate } = blogData
+        let { tag_id, type_tour_id, ...dataBlogCreate } = blogData
 
         try {
-            let newBlog = await prisma.blog.create({ data: dataBlogCreate })
+            let newBlog = await prisma.blog.create({ data: { ...dataBlogCreate, created_at: new Date() } })
 
             // Create foreign key
             if (blogData.tag_id) {
@@ -28,15 +28,15 @@ export class BlogService {
                     findTag()
                 })
             }
-            if (blogData.type_toure_id) {
-                blogData.type_toure_id.map((el: any, idx: any) => {
-                    const findTypeToure = async () => {
-                        let getTypeToure = await prisma.type_toure.findFirst({ where: { id: el } })
-                        if (getTypeToure) await prisma.blog_type_toure.create({
-                            data: { type_toure_id: el, blog_id: newBlog.id }
+            if (blogData.type_tour_id) {
+                blogData.type_tour_id.map((el: any, idx: any) => {
+                    const findTypeTour = async () => {
+                        let getTypeTour = await prisma.type_tour.findFirst({ where: { id: el } })
+                        if (getTypeTour) await prisma.blog_type_tour.create({
+                            data: { type_tour_id: el, blog_id: newBlog.id }
                         })
                     }
-                    findTypeToure()
+                    findTypeTour()
                 })
             }
 
@@ -54,8 +54,8 @@ export class BlogService {
                     blog_tag: {
                         include: { tag: true }
                     },
-                    blog_type_toure: {
-                        include: { type_toure: true }
+                    blog_type_tour: {
+                        include: { type_tour: true }
                     }
                 },
             })
@@ -68,7 +68,7 @@ export class BlogService {
     async update(blogInfo: BlogUpdateDto, id: number) {
         if (!blogInfo.title || blogInfo.title === "") return failCode("Post must have a title!")
 
-        let { tag_id, type_toure_id, ...blogUpdate } = blogInfo
+        let { tag_id, type_tour_id, ...blogUpdate } = blogInfo
 
         try {
             await prisma.blog.update({
@@ -98,25 +98,25 @@ export class BlogService {
                     findTag()
                 })
             }
-            if (blogInfo?.type_toure_id && blogInfo?.type_toure_id?.length > 0) {
-                let getBlogTypeToure = await prisma.blog_type_toure.findMany({
+            if (blogInfo?.type_tour_id && blogInfo?.type_tour_id?.length > 0) {
+                let getBlogTypeTour = await prisma.blog_type_tour.findMany({
                     where: { blog_id: id }
                 })
-                if (getBlogTypeToure) await getBlogTypeToure?.map(el => {
-                    const deleteBlogTypeToure = async () => {
-                        await prisma.blog_type_toure.delete({ where: { id: el.id } })
+                if (getBlogTypeTour) await getBlogTypeTour?.map(el => {
+                    const deleteBlogTypeTour = async () => {
+                        await prisma.blog_type_tour.delete({ where: { id: el.id } })
                     }
-                    deleteBlogTypeToure()
+                    deleteBlogTypeTour()
                 })
 
-                await blogInfo.type_toure_id.map((el: any, idx: any) => {
-                    const findTypeToure = async () => {
-                        let getTypeToure = await prisma.type_toure.findFirst({ where: { id: el } })
-                        if (getTypeToure) await prisma.blog_type_toure.create({
-                            data: { type_toure_id: el, blog_id: id }
+                await blogInfo.type_tour_id.map((el: any, idx: any) => {
+                    const findTypeTour = async () => {
+                        let getTypeTour = await prisma.type_tour.findFirst({ where: { id: el } })
+                        if (getTypeTour) await prisma.blog_type_tour.create({
+                            data: { type_tour_id: el, blog_id: id }
                         })
                     }
-                    findTypeToure()
+                    findTypeTour()
                 })
             }
 
@@ -128,10 +128,6 @@ export class BlogService {
 
     async delete(id: number) {
         try {
-            await prisma.blog.delete({
-                where: { id },
-            })
-
             let getBlogTag = await prisma.blog_tag.findMany({
                 where: { blog_id: id }
             })
@@ -142,14 +138,18 @@ export class BlogService {
                 deleteBlogTag()
             })
 
-            let getBlogTypeTour = await prisma.blog_type_toure.findMany({
+            let getBlogTypeTour = await prisma.blog_type_tour.findMany({
                 where: { blog_id: id }
             })
             if (getBlogTypeTour) await getBlogTypeTour?.map(el => {
                 const deleteBlogTypeTour = async () => {
-                    await prisma.blog_type_toure.delete({ where: { id: el.id } })
+                    await prisma.blog_type_tour.delete({ where: { id: el.id } })
                 }
                 deleteBlogTypeTour()
+            })
+
+            await prisma.blog.delete({
+                where: { id },
             })
 
             return successCode({ id }, "Blog deleted successfully!")
@@ -164,15 +164,15 @@ export class BlogService {
         pageSize: number,
         user_id: number,
         tag_id: number[],
-        type_toure_id: number[]) {
+        type_tour_id: number[]) {
         try {
             let findTag = await prisma.blog_tag.findMany({ where: { tag_id: { in: tag_id } } })
-            let findTypeToure = await prisma.blog_type_toure.findMany({ where: { type_toure_id: { in: type_toure_id } } })
+            let findTypeTour = await prisma.blog_type_tour.findMany({ where: { type_tour_id: { in: type_tour_id } } })
 
             const generateAndCondition = () => {
                 const conditions = [];
                 if (findTag && findTag?.length > 0) conditions.push({ id: { in: findTag.map(el => el.blog_id) } },)
-                if (findTypeToure && findTypeToure?.length > 0) conditions.push({ id: { in: findTypeToure.map(el => el.blog_id) } },)
+                if (findTypeTour && findTypeTour?.length > 0) conditions.push({ id: { in: findTypeTour.map(el => el.blog_id) } },)
                 if (user_id) conditions.push({ user_id },)
                 return conditions
             }
@@ -183,6 +183,7 @@ export class BlogService {
                         { title: { search: convertTsVector(keySearch) } },
                         { title: { mode: 'insensitive', contains: keySearch, } },
                         { content: { mode: 'insensitive', contains: keySearch, } },
+                        { key_word: { mode: 'insensitive', contains: keySearch, } },
                     ],
                     AND: generateAndCondition()
                 },
@@ -190,10 +191,14 @@ export class BlogService {
                     blog_tag: {
                         include: { tag: true }
                     },
-                    blog_type_toure: {
-                        include: { type_toure: true }
+                    blog_type_tour: {
+                        include: { type_tour: true }
                     }
                 },
+                orderBy: [
+                    { created_at: 'desc' }, // Sắp xếp theo cột created từ sớm nhất đến muộn nhất
+                    // { created_at: 'desc' }, // Nếu muốn sắp xếp từ muộn nhất đến sớm nhất
+                ],
                 skip: (pageNumber - 1) * pageSize,
                 take: pageSize
             })

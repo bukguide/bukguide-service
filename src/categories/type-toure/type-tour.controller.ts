@@ -1,16 +1,16 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { TypeToureService } from './type-toure.service';
+import { TypeTourService } from './type-tour.service';
 import { AuthGuard } from '@nestjs/passport';
 import { checkPermission } from 'src/ultiService/ultiService';
 import { unAuthor } from 'src/config/respone.service';
-import { TypeToureCreateDto, TypeToureUpdateDto } from 'src/dto/type-toure.dto';
+import { TypeTourCreateDto, TypeTourUpdateDto } from 'src/dto/type-tour.dto';
 
-@ApiTags("TypeToureService")
-@Controller('type-toure')
-export class TypeToureController {
+@ApiTags("TypeTourService")
+@Controller('type-tour')
+export class TypeTourController {
     constructor(
-        private readonly TypeToureService: TypeToureService
+        private readonly TypeTourService: TypeTourService
     ) { }
 
     @ApiBearerAuth()
@@ -20,7 +20,7 @@ export class TypeToureController {
     get(@Query("keySearch") keySearch: string, @Query("pageNumber") pageNumber: string, @Query("pageSize") pageSize: string, @Req() req) {
         try {
             if (!checkPermission(req, ["admin"])) return unAuthor()
-            return this.TypeToureService.get(keySearch, parseInt(pageNumber), parseInt(pageSize))
+            return this.TypeTourService.get(keySearch, parseInt(pageNumber), parseInt(pageSize))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -33,7 +33,7 @@ export class TypeToureController {
     getOne(@Query("id") id: string, @Req() req) {
         try {
             if (!checkPermission(req, ["admin"])) return unAuthor()
-            return this.TypeToureService.getOne(parseInt(id))
+            return this.TypeTourService.getOne(parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -43,8 +43,8 @@ export class TypeToureController {
     @Get('get-option')
     getOption(@Req() req) {
         try {
-            // if (!checkPermission(req, ["admin", "toureguide"])) return unAuthor()
-            return this.TypeToureService.getOption()
+            // if (!checkPermission(req, ["admin", "Tourguide"])) return unAuthor()
+            return this.TypeTourService.getOption()
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -54,10 +54,10 @@ export class TypeToureController {
     @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Post('create')
-    create(@Body() dataCreate: TypeToureCreateDto, @Req() req) {
+    create(@Body() dataCreate: TypeTourCreateDto, @Req() req) {
         try {
             if (!checkPermission(req, ["admin"])) return unAuthor()
-            return this.TypeToureService.create(dataCreate)
+            return this.TypeTourService.create(dataCreate)
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -67,10 +67,10 @@ export class TypeToureController {
     @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Post('update/:id')
-    update(@Body() dataUpdate: TypeToureUpdateDto, @Param("id") id: string, @Req() req) {
+    update(@Body() dataUpdate: TypeTourUpdateDto, @Param("id") id: string, @Req() req) {
         try {
             if (!checkPermission(req, ["admin"])) return unAuthor()
-            return this.TypeToureService.update(dataUpdate, parseInt(id))
+            return this.TypeTourService.update(dataUpdate, parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -83,7 +83,7 @@ export class TypeToureController {
     delete(@Query("id") id: string, @Req() req) {
         try {
             if (!checkPermission(req, ["admin"])) return unAuthor()
-            return this.TypeToureService.delete(parseInt(id))
+            return this.TypeTourService.delete(parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
         }

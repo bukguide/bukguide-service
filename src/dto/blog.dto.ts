@@ -12,7 +12,7 @@ export class BlogCreateDto {
     @ApiProperty({ required: false })
     tag_id: number[];
     @ApiProperty({ required: false })
-    type_toure_id: number[];
+    type_tour_id: number[];
 }
 
 export class BlogUpdateDto {
@@ -27,5 +27,5 @@ export class BlogUpdateDto {
     @ApiProperty({ required: false })
     tag_id: number[];
     @ApiProperty({ required: false })
-    type_toure_id: number[];
+    type_tour_id: number[];
 }

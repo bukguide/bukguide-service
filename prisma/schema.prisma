@@ -9,14 +9,15 @@ datasource db {
 }
 
 model blog {
-  id              Int               @id @default(autoincrement())
-  title           String
-  content         String
-  key_word        String?
-  user_id         Int
-  user_info       user_info         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  blog_tag        blog_tag[]
-  blog_type_toure blog_type_toure[]
+  id             Int              @id @default(autoincrement())
+  title          String
+  content        String
+  key_word       String?
+  user_id        Int
+  created_at     DateTime?        @db.Timestamp(6)
+  user_info      user_info        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  blog_tag       blog_tag[]
+  blog_type_tour blog_type_tour[]
 }
 
 model blog_tag {
@@ -27,12 +28,12 @@ model blog_tag {
   tag     tag  @relation(fields: [tag_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model blog_type_toure {
-  blog_id       Int
-  type_toure_id Int
-  id            Int        @id @default(autoincrement()) @db.SmallInt
-  blog          blog       @relation(fields: [blog_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  type_toure    type_toure @relation(fields: [type_toure_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model blog_type_tour {
+  blog_id      Int
+  type_tour_id Int
+  id           Int       @id(map: "blog_type_toure_pkey") @default(autoincrement()) @db.SmallInt
+  blog         blog      @relation(fields: [blog_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "blog_type_toure_blog_id_fkey")
+  type_tour    type_tour @relation(fields: [type_tour_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "blog_type_toure_type_toure_id_fkey")
 }
 
 model expertise {
@@ -65,11 +66,11 @@ model tag {
   blog_tag blog_tag[]
 }
 
-model type_toure {
-  id              Int               @id @default(autoincrement())
-  name            String
-  blog_type_toure blog_type_toure[]
-  user_type_toure user_type_toure[]
+model type_tour {
+  id             Int              @id(map: "type_toure_pkey") @default(autoincrement())
+  name           String
+  blog_type_tour blog_type_tour[]
+  user_type_tour user_type_tour[]
 }
 
 model user_expertise {
@@ -81,24 +82,24 @@ model user_expertise {
 }
 
 model user_info {
-  id              Int               @id @default(autoincrement())
-  name            String?
-  emirates_id     String?
-  license_no      String?           @db.VarChar
-  expiry_date     DateTime?         @db.Date
-  permission_id   Int
-  email           String?           @db.VarChar
-  number_phone    String?           @db.VarChar
-  created_at      DateTime?         @db.Timestamp(6)
-  updated_at      DateTime?         @db.Timestamp(6)
-  password        String?
-  approve         Boolean?
-  blog            blog[]
-  user_expertise  user_expertise[]
-  permission      permission        @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user_language   user_language[]
-  user_location   user_location[]
-  user_type_toure user_type_toure[]
+  id             Int              @id @default(autoincrement())
+  name           String?
+  emirates_id    String?
+  license_no     String?          @db.VarChar
+  expiry_date    DateTime?        @db.Date
+  permission_id  Int
+  email          String?          @db.VarChar
+  number_phone   String?          @db.VarChar
+  created_at     DateTime?        @db.Timestamp(6)
+  updated_at     DateTime?        @db.Timestamp(6)
+  password       String?
+  approve        Boolean?
+  blog           blog[]
+  user_expertise user_expertise[]
+  permission     permission       @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_language  user_language[]
+  user_location  user_location[]
+  user_type_tour user_type_tour[]
 }
 
 model user_language {
@@ -117,10 +118,10 @@ model user_location {
   user_info   user_info @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model user_type_toure {
-  user_id       Int
-  type_toure_id Int
-  id            Int        @id @default(autoincrement())
-  type_toure    type_toure @relation(fields: [type_toure_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user_info     user_info  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model user_type_tour {
+  user_id      Int
+  type_tour_id Int
+  id           Int       @id(map: "user_type_toure_pkey") @default(autoincrement())
+  type_tour    type_tour @relation(fields: [type_tour_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_type_toure_type_toure_id_fkey")
+  user_info    user_info @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_type_toure_user_id_fkey")
 }
