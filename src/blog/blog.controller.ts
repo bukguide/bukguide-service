@@ -19,7 +19,7 @@ export class BlogController {
     @Post('create')
     create(@Body() blogData: BlogCreateDto, @Req() req) {
         try {
-            if (!checkPermission(req, ["Tourguide", "admin"])) return unAuthor()
+            if (!checkPermission(req, ["tourguide", "admin"])) return unAuthor()
             return this.BlogService.create(blogData)
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -31,7 +31,7 @@ export class BlogController {
     @Get('get-id')
     getOne(@Query("id") id: string, @Req() req) {
         try {
-            if (!checkPermission(req, ["Tourguide", "admin"])) return unAuthor()
+            if (!checkPermission(req, ["tourguide", "admin"])) return unAuthor()
             return this.BlogService.getOne(parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -49,7 +49,7 @@ export class BlogController {
         @Query("typeTourId") typeTourId: number[],
         @Req() req) {
         try {
-            if (!checkPermission(req, ["Tourguide", "admin"])) return unAuthor()
+            if (!checkPermission(req, ["tourguide", "admin"])) return unAuthor()
             return this.BlogService.getBlog(
                 keySearch,
                 parseInt(pageNumber),
@@ -67,7 +67,7 @@ export class BlogController {
     @Post("update/:id")
     update(@Body() BlogInfo: BlogUpdateDto, @Param("id") id: string, @Req() req) {
         try {
-            if (!checkPermission(req, ["admin", "Tourguide"])) return unAuthor()
+            if (!checkPermission(req, ["admin", "tourguide"])) return unAuthor()
             return this.BlogService.update(BlogInfo, parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -78,7 +78,7 @@ export class BlogController {
     @Delete('delete')
     delete(@Query("id") id: string, @Req() req) {
         try {
-            if (!checkPermission(req, ["admin", "Tourguide"])) return unAuthor()
+            if (!checkPermission(req, ["admin", "tourguide"])) return unAuthor()
             return this.BlogService.delete(parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)

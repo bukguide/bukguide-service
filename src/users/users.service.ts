@@ -59,7 +59,10 @@ export class UsersService {
                     },
                     user_type_tour: {
                         include: { type_tour: true }
-                    }
+                    },
+                    user_expertise: {
+                        include: { expertise: true }
+                    },
                 },
                 skip: (pageNumber - 1) * pageSize,
                 take: pageSize
