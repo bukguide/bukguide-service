@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: nestjs.dockerfile
+    restart: unless-stopped
+    ports:
+      - "2005:3000"
+    volumes:
+      - ./dist:/app/dist
+      - ./public:/app/public

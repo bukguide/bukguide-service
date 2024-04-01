@@ -10,6 +10,7 @@ import { BlogModule } from './blog/blog.module';
 import { PermissionModule } from './categories/permission/permission.module';
 import { ExpertiseModule } from './categories/expertise/expertise.module';
 import { TypeTourModule } from './categories/type-toure/type-tour.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TypeTourModule } from './categories/type-toure/type-tour.module';
     BlogModule,
     PermissionModule,
     ExpertiseModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
