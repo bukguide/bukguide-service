@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
 const convertTsVector = (inputValue: string) => {
     return inputValue.replace(/\s/g, ' | ')
 }
@@ -7,4 +10,15 @@ const checkPermission = (req: any, role: string[]) => {
     return checkRole
 }
 
-export { convertTsVector, checkPermission }
+const deleteFileInFolder = (folderPath: any) => {
+    fs.readdir(folderPath, (err, files) => {
+        files.forEach(file => {
+            const filePath = path.join(folderPath, file);
+            fs.unlink(filePath, err => {
+                console.log('Đã xoá file:', filePath);
+            });
+        })
+    })
+}
+
+export { convertTsVector, checkPermission, deleteFileInFolder }

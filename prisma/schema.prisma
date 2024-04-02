@@ -18,6 +18,7 @@ model blog {
   user_info      user_info        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   blog_tag       blog_tag[]
   blog_type_tour blog_type_tour[]
+  image_blog     image_blog[]
 }
 
 model blog_tag {
@@ -40,6 +41,13 @@ model expertise {
   id             Int              @id @default(autoincrement())
   name           String
   user_expertise user_expertise[]
+}
+
+model image_blog {
+  id        Int    @id @default(autoincrement())
+  file_name String
+  blog_id   Int
+  blog      blog   @relation(fields: [blog_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model language {
@@ -94,6 +102,7 @@ model user_info {
   updated_at     DateTime?        @db.Timestamp(6)
   password       String?
   approve        Boolean?
+  avatar         String?
   blog           blog[]
   user_expertise user_expertise[]
   permission     permission       @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

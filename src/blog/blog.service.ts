@@ -14,7 +14,15 @@ export class BlogService {
         let { tag_id, type_tour_id, ...dataBlogCreate } = blogData
 
         try {
-            let newBlog = await prisma.blog.create({ data: { ...dataBlogCreate, created_at: new Date() } })
+            const maxId = await prisma.blog.aggregate({
+                _max: {
+                    id: true,
+                },
+            });
+            let newBlog = await prisma.blog.create({
+
+                data: { ...dataBlogCreate, id: maxId._max.id + 1, created_at: new Date() }
+            })
 
             // Create foreign key
             if (blogData.tag_id) {
@@ -40,7 +48,7 @@ export class BlogService {
                 })
             }
 
-            return successCode({ newBlog }, "Blog created successfully!")
+            return successCode(newBlog, "Blog created successfully!")
         } catch (error) {
             return errorCode(error.message)
         }
@@ -56,7 +64,8 @@ export class BlogService {
                     },
                     blog_type_tour: {
                         include: { type_tour: true }
-                    }
+                    },
+                    image_blog: true
                 },
             })
             return successCode(dataFind, "Successfully!")
@@ -193,7 +202,8 @@ export class BlogService {
                     },
                     blog_type_tour: {
                         include: { type_tour: true }
-                    }
+                    },
+                    image_blog: true
                 },
                 orderBy: [
                     { created_at: 'desc' }, // Sắp xếp theo cột created từ sớm nhất đến muộn nhất
