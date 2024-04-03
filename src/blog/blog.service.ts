@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { errorCode, failCode, successCode, successGetPage } from 'src/config/respone.service';
 import { BlogCreateDto, BlogUpdateDto } from 'src/dto/blog.dto';
-import { convertTsVector } from 'src/ultiService/ultiService';
+import { convertTsVector, maxId } from 'src/ultiService/ultiService';
 
 const prisma = new PrismaClient()
 
@@ -14,23 +14,19 @@ export class BlogService {
         let { tag_id, type_tour_id, ...dataBlogCreate } = blogData
 
         try {
-            const maxId = await prisma.blog.aggregate({
-                _max: {
-                    id: true,
-                },
-            });
+            const maxIdBlog = await maxId(prisma.blog)
             let newBlog = await prisma.blog.create({
-
-                data: { ...dataBlogCreate, id: maxId._max.id + 1, created_at: new Date() }
+                data: { ...dataBlogCreate, id: maxIdBlog, created_at: new Date() }
             })
 
             // Create foreign key
             if (blogData.tag_id) {
                 blogData.tag_id.map((el: any, idx: any) => {
                     const findTag = async () => {
+                        const maxIdBlogTag = await maxId(prisma.blog_tag)
                         let getTag = await prisma.tag.findFirst({ where: { id: el } })
                         if (getTag) await prisma.blog_tag.create({
-                            data: { tag_id: el, blog_id: newBlog.id }
+                            data: { tag_id: el, blog_id: newBlog.id, id: maxIdBlogTag }
                         })
                     }
                     findTag()
@@ -39,9 +35,10 @@ export class BlogService {
             if (blogData.type_tour_id) {
                 blogData.type_tour_id.map((el: any, idx: any) => {
                     const findTypeTour = async () => {
+                        const maxIdBlogTypeTour = await maxId(prisma.blog_type_tour)
                         let getTypeTour = await prisma.type_tour.findFirst({ where: { id: el } })
                         if (getTypeTour) await prisma.blog_type_tour.create({
-                            data: { type_tour_id: el, blog_id: newBlog.id }
+                            data: { type_tour_id: el, blog_id: newBlog.id, id: maxIdBlogTypeTour }
                         })
                     }
                     findTypeTour()
@@ -80,7 +77,7 @@ export class BlogService {
         let { tag_id, type_tour_id, ...blogUpdate } = blogInfo
 
         try {
-            await prisma.blog.update({
+            let updateBlog = await prisma.blog.update({
                 where: { id },
                 data: blogUpdate
             })
@@ -99,9 +96,10 @@ export class BlogService {
 
                 await blogInfo.tag_id.map((el: any, idx: any) => {
                     const findTag = async () => {
+                        const maxIdBlogTag = await maxId(prisma.blog_tag)
                         let getTag = await prisma.tag.findFirst({ where: { id: el } })
                         if (getTag) await prisma.blog_tag.create({
-                            data: { tag_id: el, blog_id: id }
+                            data: { tag_id: el, blog_id: id, id: maxIdBlogTag }
                         })
                     }
                     findTag()
@@ -120,16 +118,17 @@ export class BlogService {
 
                 await blogInfo.type_tour_id.map((el: any, idx: any) => {
                     const findTypeTour = async () => {
+                        const maxIdBlogTypeTour = await maxId(prisma.blog_type_tour)
                         let getTypeTour = await prisma.type_tour.findFirst({ where: { id: el } })
                         if (getTypeTour) await prisma.blog_type_tour.create({
-                            data: { type_tour_id: el, blog_id: id }
+                            data: { type_tour_id: el, blog_id: id, id: maxIdBlogTypeTour }
                         })
                     }
                     findTypeTour()
                 })
             }
 
-            return successCode(blogInfo, "Blog updated successfully!")
+            return successCode(updateBlog, "Blog updated successfully!")
         } catch (error) {
             return errorCode(error.message)
         }

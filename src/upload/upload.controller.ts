@@ -102,9 +102,9 @@ export class UploadController {
     }
 
     @HttpCode(201)
-    @Get('delete')
+    @Get('delete/:file_id')
     deleteFile(
-        @Query("file_id") file_id: string,
+        @Param("file_id") file_id: string,
         @Req() req
     ) {
         try {
