@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { errorCode, failCode, successCode, successGetPage } from 'src/config/respone.service';
 import { TagCreateDto, TagUpdateDto } from 'src/dto/tag.dto';
-import { convertTsVector } from 'src/ultiService/ultiService';
+import { convertTsVector, maxId } from 'src/ultiService/ultiService';
 
 const prisma = new PrismaClient()
 
@@ -64,8 +64,10 @@ export class TagService {
 
             if (dataFind) return failCode("Tag already exists!")
 
-            await prisma.tag.create({ data: dataCreate })
-            return successCode(dataFind, "Create successfully!")
+			const maxIdTag = await maxId(prisma.tag)
+
+            const newData = await prisma.tag.create({ data: {...dataCreate , id: maxIdTag}})
+            return successCode(newData, "Create successfully!")
         } catch (error) {
             return errorCode(error.message)
         }

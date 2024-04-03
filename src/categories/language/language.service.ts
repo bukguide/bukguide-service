@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { errorCode, failCode, successCode, successGetPage } from 'src/config/respone.service';
 import { LanguageCreateDto, LanguageUpdateDto } from 'src/dto/language.dto';
-import { convertTsVector } from 'src/ultiService/ultiService';
+import { convertTsVector, maxId } from 'src/ultiService/ultiService';
 
 const prisma = new PrismaClient()
 
@@ -63,9 +63,10 @@ export class LanguageService {
             })
 
             if (dataFind) return failCode("Language already exists!")
-
-            await prisma.language.create({ data: dataCreate })
-            return successCode(dataFind, "Create successfully!")
+			
+			const maxIdLanguage = await maxId(prisma.language)
+			const newData = await prisma.language.create({ data: {...dataCreate, id: maxIdLanguage }})
+            return successCode(newData, "Create successfully!")
         } catch (error) {
             return errorCode(error.message)
         }

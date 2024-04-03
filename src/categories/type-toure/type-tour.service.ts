@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { errorCode, failCode, successCode, successGetPage } from 'src/config/respone.service';
 import { TypeTourCreateDto, TypeTourUpdateDto } from 'src/dto/type-tour.dto';
-import { convertTsVector } from 'src/ultiService/ultiService';
+import { convertTsVector, maxId } from 'src/ultiService/ultiService';
 
 const prisma = new PrismaClient()
 
@@ -64,8 +64,9 @@ export class TypeTourService {
 
             if (dataFind) return failCode("TypeTour already exists!")
 
-            await prisma.type_tour.create({ data: dataCreate })
-            return successCode(dataFind, "Create successfully!")
+			const maxIdTypeTour = await maxId(prisma.type_tour)
+            const newData = await prisma.type_tour.create({ data: {...dataCreate, id: maxIdTypeTour} })
+            return successCode(newData, "Create successfully!")
         } catch (error) {
             return errorCode(error.message)
         }

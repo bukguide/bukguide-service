@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { errorCode, failCode, successCode, successGetPage } from 'src/config/respone.service';
 import { LocationCreateDto, LocationUpdateDto } from 'src/dto/location.dto';
-import { convertTsVector } from 'src/ultiService/ultiService';
+import { convertTsVector, maxId } from 'src/ultiService/ultiService';
 
 const prisma = new PrismaClient()
 
@@ -64,8 +64,9 @@ export class LocationService {
 
             if (dataFind) return failCode("Location already exists!")
 
-            await prisma.location.create({ data: dataCreate })
-            return successCode(dataFind, "Create successfully!")
+			const maxIdLocation = await maxId(prisma.location)
+            const newData = await prisma.location.create({ data: {...dataCreate, id: maxIdLocation} })
+            return successCode(newData, "Create successfully!")
         } catch (error) {
             return errorCode(error.message)
         }

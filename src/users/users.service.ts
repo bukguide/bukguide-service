@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { UserCreateDto, UserLoginDto, UserUpdateDto } from '../dto/users.dto';
 import * as bcrypt from 'bcrypt';
 import { errorCode, failCode, successCode, successGetPage } from 'src/config/respone.service';
-import { convertTsVector } from 'src/ultiService/ultiService';
+import { convertTsVector, maxId } from 'src/ultiService/ultiService';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
@@ -103,9 +103,11 @@ export class UsersService {
         if (checkNumber_phone) return failCode("Number phone already exists!")
 
         // HashSync user information
-        let { location_id, language_id, type_tour_id, expertise_id, ...dataUserInfo } = userInfo
+		const maxIdUser = await maxId(prisma.user_info)
+		let { location_id, language_id, type_tour_id, expertise_id, ...dataUserInfo } = userInfo
         let dataUserCreate: any = {
             ...dataUserInfo,
+			id: maxIdUser,
             password: bcrypt.hashSync(userInfo.password, 10),
             created_at: new Date(),
             updated_at: new Date(),
@@ -119,9 +121,10 @@ export class UsersService {
             if (userInfo.language_id) {
                 userInfo.language_id.map((el: any, idx: any) => {
                     const findLanguage = async () => {
-                        let getLanguage = await prisma.language.findFirst({ where: { id: el } })
+                        const maxIdUserLanguage = await maxId(prisma.user_language)
+						let getLanguage = await prisma.language.findFirst({ where: { id: el } })
                         if (getLanguage) await prisma.user_language.create({
-                            data: { language_id: el, user_id: newUser.id }
+                            data: { language_id: el, user_id: newUser.id, id: maxIdUserLanguage }
                         })
                     }
                     findLanguage()
@@ -130,9 +133,10 @@ export class UsersService {
             if (userInfo.location_id) {
                 userInfo.location_id.map((el: any, idx: any) => {
                     const findLocation = async () => {
+                        const maxIdUserLocation = await maxId(prisma.user_location)
                         let getLocation = await prisma.location.findFirst({ where: { id: el } })
                         if (getLocation) await prisma.user_location.create({
-                            data: { location_id: el, user_id: newUser.id }
+                            data: { location_id: el, user_id: newUser.id, id: maxIdUserLocation}
                         })
                     }
                     findLocation()
@@ -141,9 +145,10 @@ export class UsersService {
             if (userInfo.type_tour_id) {
                 userInfo.type_tour_id.map((el: any, idx: any) => {
                     const findTypeTour = async () => {
+                        const maxIdTypeTour = await maxId(prisma.user_type_tour)
                         let getTypeTour = await prisma.type_tour.findFirst({ where: { id: el } })
                         if (getTypeTour) await prisma.user_type_tour.create({
-                            data: { type_tour_id: el, user_id: newUser.id }
+                            data: { type_tour_id: el, user_id: newUser.id, id: maxIdTypeTour }
                         })
                     }
                     findTypeTour()
@@ -152,9 +157,10 @@ export class UsersService {
             if (userInfo.expertise_id) {
                 userInfo.expertise_id.map((el: any, idx: any) => {
                     const findExpertise = async () => {
+                        const maxIdUserExpertite = await maxId(prisma.user_expertise)
                         let getExpertise = await prisma.expertise.findFirst({ where: { id: el } })
                         if (getExpertise) await prisma.user_expertise.create({
-                            data: { expertise_id: el, user_id: newUser.id }
+                            data: { expertise_id: el, user_id: newUser.id, id: maxIdUserExpertite }
                         })
                     }
                     findExpertise()
@@ -190,9 +196,10 @@ export class UsersService {
 
                 await userInfo.language_id.map((el: any, idx: any) => {
                     const findLanguage = async () => {
+                        const maxIdUserLanguage = await maxId(prisma.user_language)
                         let getLanguage = await prisma.language.findFirst({ where: { id: el } })
                         if (getLanguage) await prisma.user_language.create({
-                            data: { language_id: el, user_id: id }
+                            data: { language_id: el, user_id: id, id: maxIdUserLanguage }
                         })
                     }
                     findLanguage()
@@ -211,9 +218,10 @@ export class UsersService {
 
                 await userInfo.location_id.map((el: any, idx: any) => {
                     const findLocation = async () => {
+                        const maxIdUserLocation = await maxId(prisma.user_location)
                         let getLocation = await prisma.location.findFirst({ where: { id: el } })
                         if (getLocation) await prisma.user_location.create({
-                            data: { location_id: el, user_id: id }
+                            data: { location_id: el, user_id: id, id: maxIdUserLocation }
                         })
                     }
                     findLocation()
@@ -232,9 +240,10 @@ export class UsersService {
 
                 await userInfo.type_tour_id.map((el: any, idx: any) => {
                     const findTypeTour = async () => {
+                        const maxIdTypeTour = await maxId(prisma.user_type_tour)
                         let getTypeTour = await prisma.type_tour.findFirst({ where: { id: el } })
                         if (getTypeTour) await prisma.user_type_tour.create({
-                            data: { type_tour_id: el, user_id: id }
+                            data: { type_tour_id: el, user_id: id, id: maxIdTypeTour }
                         })
                     }
                     findTypeTour()
@@ -253,9 +262,10 @@ export class UsersService {
 
                 await userInfo.expertise_id.map((el: any, idx: any) => {
                     const findExpertise = async () => {
+                        const maxIdUserExpertite = await maxId(prisma.user_expertise)
                         let getExpertise = await prisma.expertise.findFirst({ where: { id: el } })
                         if (getExpertise) await prisma.user_expertise.create({
-                            data: { expertise_id: el, user_id: id }
+                            data: { expertise_id: el, user_id: id, id: maxIdUserExpertite }
                         })
                     }
                     findExpertise()

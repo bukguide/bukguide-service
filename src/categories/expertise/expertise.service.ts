@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { errorCode, failCode, successCode, successGetPage } from 'src/config/respone.service';
 import { ExpertiseCreateDto, ExpertiseUpdateDto } from 'src/dto/expertise.dto';
-import { convertTsVector } from 'src/ultiService/ultiService';
+import { convertTsVector, maxId } from 'src/ultiService/ultiService';
 
 const prisma = new PrismaClient()
 
@@ -64,8 +64,10 @@ export class ExpertiseService {
 
             if (dataFind) return failCode("Expertise already exists!")
 
-            await prisma.expertise.create({ data: dataCreate })
-            return successCode(dataFind, "Create successfully!")
+			const maxIdExpertite = await maxId(prisma.expertise)
+
+            const newData = await prisma.expertise.create({ data: {...dataCreate ,id: maxIdExpertite} })
+            return successCode(newData, "Create successfully!")
         } catch (error) {
             return errorCode(error.message)
         }
