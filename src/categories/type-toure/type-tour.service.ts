@@ -49,7 +49,13 @@ export class TypeTourService {
 
     async getOption() {
         try {
-            let dataFind = await prisma.type_tour.findMany()
+            let dataFind = await prisma.type_tour.findMany({
+                include: {
+                    _count: {
+                        select: { user_type_tour: true }
+                    }
+                }
+            })
             return successCode(dataFind, "Successfully!")
         } catch (error) {
             return errorCode(error.message)
@@ -64,8 +70,8 @@ export class TypeTourService {
 
             if (dataFind) return failCode("TypeTour already exists!")
 
-			const maxIdTypeTour = await maxId(prisma.type_tour)
-            const newData = await prisma.type_tour.create({ data: {...dataCreate, id: maxIdTypeTour} })
+            const maxIdTypeTour = await maxId(prisma.type_tour)
+            const newData = await prisma.type_tour.create({ data: { ...dataCreate, id: maxIdTypeTour } })
             return successCode(newData, "Create successfully!")
         } catch (error) {
             return errorCode(error.message)

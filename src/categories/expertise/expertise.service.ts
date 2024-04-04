@@ -49,7 +49,13 @@ export class ExpertiseService {
 
     async getOption() {
         try {
-            let dataFind = await prisma.expertise.findMany()
+            let dataFind = await prisma.expertise.findMany({
+                include: {
+                    _count: {
+                        select: { user_expertise: true }
+                    }
+                }
+            })
             return successCode(dataFind, "Successfully!")
         } catch (error) {
             return errorCode(error.message)
@@ -64,9 +70,9 @@ export class ExpertiseService {
 
             if (dataFind) return failCode("Expertise already exists!")
 
-			const maxIdExpertite = await maxId(prisma.expertise)
+            const maxIdExpertite = await maxId(prisma.expertise)
 
-            const newData = await prisma.expertise.create({ data: {...dataCreate ,id: maxIdExpertite} })
+            const newData = await prisma.expertise.create({ data: { ...dataCreate, id: maxIdExpertite } })
             return successCode(newData, "Create successfully!")
         } catch (error) {
             return errorCode(error.message)

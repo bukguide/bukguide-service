@@ -23,8 +23,6 @@ export class UsersController {
         return this.UsersService.login(UserLogin)
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Get('get')
     getUser(@Query("keySearch") keySearch: string,
@@ -38,7 +36,7 @@ export class UsersController {
         @Query("expertise_id") expertise_id: number[],
         @Req() req) {
         try {
-            if (!checkPermission(req, ["admin"])) return unAuthor()
+            // if (!checkPermission(req, ["admin"])) return unAuthor()
             return this.UsersService.getUsers(
                 keySearch,
                 parseInt(pageNumber),
@@ -54,6 +52,17 @@ export class UsersController {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
         }
     };
+
+    @HttpCode(201)
+    @Get('get-id')
+    getOne(@Query("id") id: string, @Req() req) {
+        try {
+            // if (!checkPermission(req, ["admin", "tourguide"])) return unAuthor()
+            return this.UsersService.getOne(parseInt(id))
+        } catch (error) {
+            throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
 
     @ApiBearerAuth()
     @UseGuards(AuthGuard("jwt"))
@@ -89,19 +98,6 @@ export class UsersController {
         try {
             if (!checkPermission(req, ["admin", "tourguide"])) return unAuthor()
             return this.UsersService.unApprove(parseInt(id))
-        } catch (error) {
-            throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
-        }
-    }
-
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard("jwt"))
-    @HttpCode(201)
-    @Get('get-id')
-    getOne(@Query("id") id: string, @Req() req) {
-        try {
-            if (!checkPermission(req, ["admin", "tourguide"])) return unAuthor()
-            return this.UsersService.getOne(parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
         }

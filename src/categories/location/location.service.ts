@@ -49,7 +49,13 @@ export class LocationService {
 
     async getOption() {
         try {
-            let dataFind = await prisma.location.findMany()
+            let dataFind = await prisma.location.findMany({
+                include: {
+                    _count: {
+                        select: { user_location: true }
+                    }
+                }
+            })
             return successCode(dataFind, "Successfully!")
         } catch (error) {
             return errorCode(error.message)
@@ -64,8 +70,8 @@ export class LocationService {
 
             if (dataFind) return failCode("Location already exists!")
 
-			const maxIdLocation = await maxId(prisma.location)
-            const newData = await prisma.location.create({ data: {...dataCreate, id: maxIdLocation} })
+            const maxIdLocation = await maxId(prisma.location)
+            const newData = await prisma.location.create({ data: { ...dataCreate, id: maxIdLocation } })
             return successCode(newData, "Create successfully!")
         } catch (error) {
             return errorCode(error.message)

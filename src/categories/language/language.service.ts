@@ -19,7 +19,8 @@ export class LanguageService {
                     ]
                 },
                 skip: (pageNumber - 1) * pageSize,
-                take: pageSize
+                take: pageSize,
+
             })
             let countTotalData = await prisma.language.count({
                 where: {
@@ -49,7 +50,13 @@ export class LanguageService {
 
     async getOption() {
         try {
-            let dataFind = await prisma.language.findMany()
+            let dataFind = await prisma.language.findMany({
+                include: {
+                    _count: {
+                        select: { user_language: true }
+                    }
+                }
+            })
             return successCode(dataFind, "Successfully!")
         } catch (error) {
             return errorCode(error.message)
@@ -63,9 +70,9 @@ export class LanguageService {
             })
 
             if (dataFind) return failCode("Language already exists!")
-			
-			const maxIdLanguage = await maxId(prisma.language)
-			const newData = await prisma.language.create({ data: {...dataCreate, id: maxIdLanguage }})
+
+            const maxIdLanguage = await maxId(prisma.language)
+            const newData = await prisma.language.create({ data: { ...dataCreate, id: maxIdLanguage } })
             return successCode(newData, "Create successfully!")
         } catch (error) {
             return errorCode(error.message)

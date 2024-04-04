@@ -7,14 +7,14 @@ import { checkPermission } from 'src/ultiService/ultiService';
 import { unAuthor } from 'src/config/respone.service';
 
 @ApiTags("BlogService")
-@ApiBearerAuth()
-@UseGuards(AuthGuard("jwt"))
 @Controller('blog')
 export class BlogController {
     constructor(
         private readonly BlogService: BlogService
     ) { }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Post('create')
     create(@Body() blogData: BlogCreateDto, @Req() req) {
@@ -31,7 +31,7 @@ export class BlogController {
     @Get('get-id')
     getOne(@Query("id") id: string, @Req() req) {
         try {
-            if (!checkPermission(req, ["tourguide", "admin"])) return unAuthor()
+            // if (!checkPermission(req, ["tourguide", "admin"])) return unAuthor()
             return this.BlogService.getOne(parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -41,7 +41,7 @@ export class BlogController {
     // Lấy toàn bộ Blog và filter theo user_id, tag, type_tour. Tìm kiếm theo keyWord
     @HttpCode(201)
     @Get('get')
-    getUser(@Query("keySearch") keySearch: string,
+    getBlog(@Query("keySearch") keySearch: string,
         @Query("pageNumber") pageNumber: string,
         @Query("pageSize") pageSize: string,
         @Query("userId") userId: number,
@@ -49,7 +49,7 @@ export class BlogController {
         @Query("typeTourId") typeTourId: number[],
         @Req() req) {
         try {
-            if (!checkPermission(req, ["tourguide", "admin"])) return unAuthor()
+            // if (!checkPermission(req, ["tourguide", "admin"])) return unAuthor()
             return this.BlogService.getBlog(
                 keySearch,
                 parseInt(pageNumber),
@@ -63,6 +63,8 @@ export class BlogController {
         }
     };
     // Chỉnh sửa
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Post("update/:id")
     update(@Body() BlogInfo: BlogUpdateDto, @Param("id") id: string, @Req() req) {
@@ -74,6 +76,8 @@ export class BlogController {
         }
     }
     // Xoá
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
     @Delete('delete')
     delete(@Query("id") id: string, @Req() req) {

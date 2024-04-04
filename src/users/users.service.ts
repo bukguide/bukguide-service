@@ -63,9 +63,12 @@ export class UsersService {
                     user_expertise: {
                         include: { expertise: true }
                     },
+                    _count: {
+                        select: { blog: true }
+                    }
                 },
                 skip: (pageNumber - 1) * pageSize,
-                take: pageSize
+                take: pageSize,
             })
             let countTotalData = await prisma.user_info.count({
                 where: {
@@ -78,7 +81,12 @@ export class UsersService {
                 },
             })
 
-            return successGetPage(data, pageNumber, pageSize, countTotalData)
+            const dataRemovePassword = data?.map((el: any) => {
+                const { password, permission, approve, ...removePas } = el
+                return removePas
+            })
+
+            return successGetPage(dataRemovePassword, pageNumber, pageSize, countTotalData)
         } catch (error) {
             return errorCode(error.message)
         }
@@ -103,11 +111,11 @@ export class UsersService {
         if (checkNumber_phone) return failCode("Number phone already exists!")
 
         // HashSync user information
-		const maxIdUser = await maxId(prisma.user_info)
-		let { location_id, language_id, type_tour_id, expertise_id, ...dataUserInfo } = userInfo
+        const maxIdUser = await maxId(prisma.user_info)
+        let { location_id, language_id, type_tour_id, expertise_id, ...dataUserInfo } = userInfo
         let dataUserCreate: any = {
             ...dataUserInfo,
-			id: maxIdUser,
+            id: maxIdUser,
             password: bcrypt.hashSync(userInfo.password, 10),
             created_at: new Date(),
             updated_at: new Date(),
@@ -122,7 +130,7 @@ export class UsersService {
                 userInfo.language_id.map((el: any, idx: any) => {
                     const findLanguage = async () => {
                         const maxIdUserLanguage = await maxId(prisma.user_language)
-						let getLanguage = await prisma.language.findFirst({ where: { id: el } })
+                        let getLanguage = await prisma.language.findFirst({ where: { id: el } })
                         if (getLanguage) await prisma.user_language.create({
                             data: { language_id: el, user_id: newUser.id, id: maxIdUserLanguage }
                         })
@@ -136,7 +144,7 @@ export class UsersService {
                         const maxIdUserLocation = await maxId(prisma.user_location)
                         let getLocation = await prisma.location.findFirst({ where: { id: el } })
                         if (getLocation) await prisma.user_location.create({
-                            data: { location_id: el, user_id: newUser.id, id: maxIdUserLocation}
+                            data: { location_id: el, user_id: newUser.id, id: maxIdUserLocation }
                         })
                     }
                     findLocation()

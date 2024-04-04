@@ -49,7 +49,13 @@ export class TagService {
 
     async getOption() {
         try {
-            let dataFind = await prisma.tag.findMany()
+            let dataFind = await prisma.tag.findMany({
+                include: {
+                    _count: {
+                        select: { blog_tag: true }
+                    }
+                }
+            })
             return successCode(dataFind, "Successfully!")
         } catch (error) {
             return errorCode(error.message)
