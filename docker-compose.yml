@@ -4,9 +4,10 @@ services:
     build:
       context: .
       dockerfile: nestjs.dockerfile
+    command: npm run start
     restart: unless-stopped
     ports:
-      - "2005:3000"
+      - "3000:3000"
     volumes:
-      - ./dist:/app/dist
-      - ./public:/app/public
+      - .:/usr/src/app
+      - /usr/src/app/node_modules

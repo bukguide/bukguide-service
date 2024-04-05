@@ -1,26 +1,21 @@
-# Sử dụng image cơ bản
-FROM node
+FROM node:alpine
 
-# Thiết lập thư mục làm việc
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Sao chép các file package.json và package-lock.json
 COPY package*.json ./
 
-# Cài đặt dependencies
-RUN npm install
+RUN npm install --force
 
-# Sao chép mã nguồn của ứng dụng vào thư mục làm việc
 COPY . .
 
-# Tạo schema của Prisma
 RUN npm cache clean --force
-RUN npm rebuild bcrypt --build-from-source
 RUN npm install prisma
 RUN npx prisma generate
 
-# Expose cổng mà ứng dụng của bạn chạy trên
 EXPOSE 3000
 
-# Lệnh để chạy ứng dụng của bạn
-CMD ["npm", "run", "start:prod"]
+# CMD ["npm", "run", "start:prod"]
+
+RUN npm run build
+
+CMD [ "node", "dist/src/main.js" ]
