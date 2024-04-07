@@ -156,6 +156,16 @@ export class BlogService {
                 deleteBlogTypeTour()
             })
 
+            let getBlogImage = await prisma.image_blog.findMany({
+                where: { blog_id: id }
+            })
+            if (getBlogImage) await getBlogImage?.map(el => {
+                const deleteBlogImage = async () => {
+                    await prisma.image_blog.delete({ where: { id: el.id } })
+                }
+                deleteBlogImage()
+            })
+
             await prisma.blog.delete({
                 where: { id },
             })
