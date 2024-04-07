@@ -12,7 +12,7 @@ RUN npm cache clean --force
 RUN npm install prisma
 RUN npx prisma generate
 
-EXPOSE 3000
+EXPOSE 3000 80
 
 # CMD ["npm", "run", "start:prod"]
 
