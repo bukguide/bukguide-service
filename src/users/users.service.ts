@@ -35,7 +35,7 @@ export class UsersService {
                 if (findLocation && findLocation?.length > 0) conditions.push({ id: { in: findLocation.map(el => el.user_id) } },)
                 if (findTypeTour && findTypeTour?.length > 0) conditions.push({ id: { in: findTypeTour.map(el => el.user_id) } },)
                 if (findExpertise && findExpertise?.length > 0) conditions.push({ id: { in: findExpertise.map(el => el.user_id) } },)
-                if (permission_id) conditions.push({ permission_id },)
+                // if (permission_id) conditions.push({ permission_id },)
                 approve === "true" ? conditions.push({ approve: true }) : conditions.push({ approve: false })
                 return conditions
             }
