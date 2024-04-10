@@ -13,11 +13,12 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('swg', app, document);
 
   app.enableCors({
     origin: true,
   });
+  app.setGlobalPrefix('api')
   app.use(express.static("."));
   await app.listen(3000);
 }
