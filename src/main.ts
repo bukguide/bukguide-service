@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express';
+import * as path from 'path'; // Thêm vào để sử dụng path module
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -18,8 +20,10 @@ async function bootstrap() {
   app.enableCors({
     origin: true,
   });
-  app.setGlobalPrefix('api')
-  app.use(express.static("."));
+  app.setGlobalPrefix('api');
+
+  app.use('/image', express.static('public')); // Đường dẫn tới thư mục public
+
   await app.listen(3000);
 }
 bootstrap();

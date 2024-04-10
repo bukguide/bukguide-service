@@ -45,8 +45,11 @@ export class UploadController {
                 const user_id = req.params.user_id;
                 let date = new Date();
                 return callback(null, `${user_id}_${date.getTime()}_${file.originalname}`)
-            }
-        })
+            },
+        }),
+        limits: {
+            fileSize: 1024 * 1024 * 200
+        }
     }))
     @HttpCode(201)
     @Post('upload-avatar/:user_id')
