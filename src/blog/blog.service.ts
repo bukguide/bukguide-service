@@ -189,8 +189,8 @@ export class BlogService {
 
             const generateAndCondition = () => {
                 const conditions = [];
-                if (findTag && findTag?.length > 0) conditions.push({ id: { in: findTag.map(el => el.blog_id) } },)
-                if (findTypeTour && findTypeTour?.length > 0) conditions.push({ id: { in: findTypeTour.map(el => el.blog_id) } },)
+                if (tag_id && tag_id?.length > 0) conditions.push({ id: { in: findTag.map(el => el.blog_id) } },)
+                if (type_tour_id && type_tour_id?.length > 0) conditions.push({ id: { in: findTypeTour.map(el => el.blog_id) } },)
                 if (user_id) conditions.push({ user_id },)
                 return conditions
             }
@@ -212,7 +212,13 @@ export class BlogService {
                     blog_type_tour: {
                         include: { type_tour: true }
                     },
-                    image_blog: true
+                    image_blog: true,
+                    user_info: {
+                        select: {
+                            name: true,
+                            id: true
+                        }
+                    }
                 },
                 orderBy: [
                     { created_at: 'desc' }, // Sắp xếp theo cột created từ sớm nhất đến muộn nhất

@@ -52,7 +52,10 @@ export class TypeTourService {
             let dataFind = await prisma.type_tour.findMany({
                 include: {
                     _count: {
-                        select: { user_type_tour: true }
+                        select: {
+                            user_type_tour: true,
+                            blog_type_tour: true
+                        }
                     }
                 }
             })

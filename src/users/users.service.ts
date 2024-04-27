@@ -31,14 +31,16 @@ export class UsersService {
 
             const generateAndCondition = () => {
                 const conditions = [];
-                if (findLanguage && findLanguage?.length > 0) conditions.push({ id: { in: findLanguage.map(el => el.user_id) } },)
-                if (findLocation && findLocation?.length > 0) conditions.push({ id: { in: findLocation.map(el => el.user_id) } },)
-                if (findTypeTour && findTypeTour?.length > 0) conditions.push({ id: { in: findTypeTour.map(el => el.user_id) } },)
-                if (findExpertise && findExpertise?.length > 0) conditions.push({ id: { in: findExpertise.map(el => el.user_id) } },)
+                if (language_id && language_id?.length > 0) conditions.push({ id: { in: findLanguage.map(el => el.user_id) } },)
+                if (location_id && location_id?.length > 0) conditions.push({ id: { in: findLocation.map(el => el.user_id) } },)
+                if (type_tour_id && type_tour_id?.length > 0) conditions.push({ id: { in: findTypeTour.map(el => el.user_id) } },)
+                if (expertise_id && expertise_id?.length > 0) conditions.push({ id: { in: findExpertise.map(el => el.user_id) } },)
                 // if (permission_id) conditions.push({ permission_id },)
                 approve === "true" ? conditions.push({ approve: true }) : conditions.push({ approve: false })
+
                 return conditions
             }
+
 
             let data = await prisma.user_info.findMany({
                 where: {
