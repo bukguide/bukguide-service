@@ -6,6 +6,7 @@ import { errorCode, failCode, successCode, successGetPage } from 'src/config/res
 import { convertTsVector, maxId } from 'src/ultiService/ultiService';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { sendEmailService } from 'src/email/emailService';
 
 const prisma = new PrismaClient()
 
@@ -177,6 +178,9 @@ export class UsersService {
                 })
             }
 
+            // Send Email
+            sendEmailService('login', { userName: userInfo.name }, userInfo.email, 'WELCOME TO BUKGUID.COM')
+
             return successCode({ userName: newUser.name }, "User created successfully!")
         } catch (error) {
             return errorCode(error.message)
@@ -297,6 +301,10 @@ export class UsersService {
                 where: { id },
                 data: { approve: true }
             })
+
+            // Send Email
+            sendEmailService('approve', { userName: findUser.name }, findUser.email, 'Your account has been authorized')
+
             return successCode({ username: findUser.name }, "User approved successfully!")
         } catch (error) {
             return errorCode(error.message)
