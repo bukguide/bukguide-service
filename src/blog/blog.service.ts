@@ -11,6 +11,13 @@ export class BlogService {
 
     async create(blogData: BlogCreateDto) {
         if (!blogData.title || blogData.title === "" || blogData.title?.length == 0) return failCode("Post must have a title!")
+
+        const findBlogTitle = await prisma.blog.findFirst({
+            where: { title: blogData.title }
+        })
+
+        if (findBlogTitle) return failCode("The title is duplicated with another article, please give another title!")
+
         let { tag_id, type_tour_id, ...dataBlogCreate } = blogData
 
         try {
@@ -62,7 +69,13 @@ export class BlogService {
                     blog_type_tour: {
                         include: { type_tour: true }
                     },
-                    image_blog: true
+                    image_blog: true,
+                    user_info: {
+                        select: {
+                            name: true,
+                            id: true
+                        }
+                    }
                 },
             })
             return successCode(dataFind, "Successfully!")
