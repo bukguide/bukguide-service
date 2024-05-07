@@ -179,7 +179,7 @@ export class UsersService {
             }
 
             // Send Email
-            sendEmailService('login', { userName: userInfo.name }, userInfo.email, 'WELCOME TO BUKGUID.COM')
+            // sendEmailService('login', { userName: userInfo.name }, userInfo.email, 'WELCOME TO BUKGUID.COM')
 
             return successCode({ userName: newUser.name }, "User created successfully!")
         } catch (error) {
@@ -286,7 +286,15 @@ export class UsersService {
                 })
             }
 
-            return successCode(userInfo, "User updated successfully!")
+            let token = this.jwtService.sign(
+                { data: userInfo },
+                {
+                    expiresIn: '72h',
+                    secret: this.config.get('SECRET_KEY')
+                }
+            )
+
+            return successCode({ userInfo, token }, "User updated successfully!")
         } catch (error) {
             return errorCode(error.message)
         }
@@ -303,7 +311,7 @@ export class UsersService {
             })
 
             // Send Email
-            sendEmailService('approve', { userName: findUser.name }, findUser.email, 'Your account has been authorized')
+            // sendEmailService('approve', { userName: findUser.name }, findUser.email, 'Your account has been authorized')
 
             return successCode({ username: findUser.name }, "User approved successfully!")
         } catch (error) {
