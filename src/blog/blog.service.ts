@@ -73,7 +73,8 @@ export class BlogService {
                     user_info: {
                         select: {
                             name: true,
-                            id: true
+                            id: true,
+                            avatar: true
                         }
                     }
                 },
@@ -229,7 +230,8 @@ export class BlogService {
                     user_info: {
                         select: {
                             name: true,
-                            id: true
+                            id: true,
+                            avatar: true,
                         }
                     }
                 },
