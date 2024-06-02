@@ -55,9 +55,17 @@ export class UserUpdateDto {
     @ApiProperty({ required: false })
     expertise_id: number[];
 }
+
 export class UserLoginDto {
     @ApiProperty()
     email: string;
     @ApiProperty()
     password: string;
+}
+
+export class UserResetPasswordDto {
+    @ApiProperty()
+    password_old: string;
+    @ApiProperty()
+    password_new: string;
 }

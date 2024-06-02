@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Headers, HttpCode, HttpException, HttpStatus, Param, Post, Query, Req, UseGuards, } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UserCreateDto, UserLoginDto, UserUpdateDto } from '../dto/users.dto';
+import { UserCreateDto, UserLoginDto, UserResetPasswordDto, UserUpdateDto } from '../dto/users.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { checkPermission } from 'src/ultiService/ultiService';
@@ -21,6 +21,32 @@ export class UsersController {
     @Post('login')
     login(@Body() UserLogin: UserLoginDto) {
         return this.UsersService.login(UserLogin)
+    }
+
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
+    @HttpCode(201)
+    @Post('reset-password')
+    resetPassword(@Body() UserResetPassword: UserResetPasswordDto, @Req() req) {
+        try {
+            if (!checkPermission(req, ["admin", "tourguide"])) return unAuthor()
+            return this.UsersService.resetPassword(UserResetPassword, parseInt(req.user.data.id))
+        } catch (error) {
+            throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard("jwt"))
+    @HttpCode(201)
+    @Post('reset-password-token')
+    resetPasswordToken(@Req() req) {
+        try {
+            if (!checkPermission(req, ["admin", "tourguide"])) return unAuthor()
+            return this.UsersService.resetPasswordToken(req.user.data)
+        } catch (error) {
+            throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     @HttpCode(201)
@@ -64,6 +90,17 @@ export class UsersController {
         }
     }
 
+    @HttpCode(201)
+    @Get('get-option')
+    getOption(@Req() req) {
+        try {
+            // if (!checkPermission(req, ["admin", "Tourguide"])) return unAuthor()
+            return this.UsersService.getOption()
+        } catch (error) {
+            throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
     @ApiBearerAuth()
     @UseGuards(AuthGuard("jwt"))
     @HttpCode(201)
@@ -83,7 +120,7 @@ export class UsersController {
     @Post("approve/:id")
     approve(@Param("id") id: string, @Req() req) {
         try {
-            if (!checkPermission(req, ["admin", "tourguide"])) return unAuthor()
+            if (!checkPermission(req, ["admin"])) return unAuthor()
             return this.UsersService.approve(parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -96,7 +133,7 @@ export class UsersController {
     @Post("un-approve/:id")
     unApprove(@Param("id") id: string, @Req() req) {
         try {
-            if (!checkPermission(req, ["admin", "tourguide"])) return unAuthor()
+            if (!checkPermission(req, ["admin"])) return unAuthor()
             return this.UsersService.unApprove(parseInt(id))
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)

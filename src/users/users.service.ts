@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { UserCreateDto, UserLoginDto, UserUpdateDto } from '../dto/users.dto';
+import { UserCreateDto, UserLoginDto, UserResetPasswordDto, UserUpdateDto } from '../dto/users.dto';
 import * as bcrypt from 'bcrypt';
 import { errorCode, failCode, successCode, successGetPage } from 'src/config/respone.service';
 import { convertTsVector, maxId } from 'src/ultiService/ultiService';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { sendEmailService } from 'src/email/emailService';
+import { use } from 'passport';
 
 const prisma = new PrismaClient()
 
@@ -187,6 +188,70 @@ export class UsersService {
         }
     }
 
+    async resetPassword(UserResetPassword: UserResetPasswordDto, id: number) {
+        if (!Boolean(UserResetPassword.password_new)) return failCode("New password is required")
+        try {
+            let findUser = await prisma.user_info.findFirst({
+                where: { id },
+                include: { permission: true },
+
+            })
+            if (!findUser) return failCode("User not found!")
+            if (UserResetPassword.password_new === UserResetPassword.password_old) return failCode("Please choose a new password that is different from your old password!")
+            if (bcrypt.compareSync(UserResetPassword.password_old, findUser.password)) {
+                let { password, ...userResultToken } = { ...findUser, password_new: UserResetPassword.password_new }
+                let token = this.jwtService.sign(
+                    { data: { ...userResultToken } },
+                    {
+                        expiresIn: '10m',
+                        secret: this.config.get('SECRET_KEY')
+                    }
+                )
+
+                sendEmailService(
+                    'reset-password',
+                    {
+                        userName: findUser.name,
+                        token,
+                        date: new Date()
+                    },
+                    findUser.email,
+                    'Reset your password in Bukguide.com'
+                )
+
+                return successCode("Please check your email for the password reset token. This token will expire in 10 minutes", "Confirm successful!")
+            } else {
+                return failCode("Passwords incorrect!")
+            }
+        } catch (error) {
+            return errorCode(error.message)
+        }
+    }
+
+    async resetPasswordToken(UserResetPassword: any) {
+        if (!Boolean(UserResetPassword.password_new)) return failCode("New password is required")
+        try {
+            let findUser = await prisma.user_info.findFirst({
+                where: { id: UserResetPassword.id },
+            })
+
+            if (!findUser) return failCode("User not found!")
+            if (UserResetPassword.password_new === UserResetPassword.password_old) return failCode("Please choose a new password that is different from your old password!")
+            await prisma.user_info.update({
+                where: { id: UserResetPassword.id },
+                data: {
+                    ...findUser,
+                    password: bcrypt.hashSync(UserResetPassword.password_new, 10),
+                    updated_at: new Date()
+                }
+            })
+
+            return successCode("Reset password success!", "Reset your password in Bukguide.com")
+        } catch (error) {
+            return errorCode(error.message)
+        }
+    }
+
     async update(userInfo: UserUpdateDto, id: number) {
         let { language_id, location_id, type_tour_id, expertise_id, ...userUpdate } = userInfo
 
@@ -355,6 +420,29 @@ export class UsersService {
                 }
             })
             let { password, ...dataResult } = dataFind
+            return successCode(dataResult, "Successfully!")
+        } catch (error) {
+            return errorCode(error.message)
+        }
+    }
+
+    async getOption() {
+        try {
+            let dataFind = await prisma.user_info.findMany({
+                include: {
+                    _count: {
+                        select: { blog: true }
+                    }
+                }
+            })
+            const dataResult = dataFind?.map((user: any) => {
+                return {
+                    id: user.id,
+                    name: user.name,
+                    avatar: user.avatar,
+                    _count: user._count
+                }
+            })
             return successCode(dataResult, "Successfully!")
         } catch (error) {
             return errorCode(error.message)
