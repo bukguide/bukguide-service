@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { log } from 'console';
 import { errorCode, failCode, successCode, successGetPage } from 'src/config/respone.service';
 import { BlogCreateDto, BlogUpdateDto } from 'src/dto/blog.dto';
 import { convertTsVector, maxId } from 'src/ultiService/ultiService';
 
 const prisma = new PrismaClient()
+const urlPattern = /https?:\/\/[^\s"]+/g;
 
 @Injectable()
 export class BlogService {
@@ -51,6 +53,11 @@ export class BlogService {
                     findTypeTour()
                 })
             }
+            const urls = blogData.content.match(urlPattern);
+            const maxIdImageBlog = await maxId(prisma.image_blog)
+            await prisma.image_blog.create({
+                data: { file_name: urls[0], blog_id: newBlog.id, id: maxIdImageBlog }
+            })
 
             return successCode(newBlog, "Blog created successfully!")
         } catch (error) {
@@ -141,6 +148,18 @@ export class BlogService {
                     findTypeTour()
                 })
             }
+            const urls = blogInfo.content.match(urlPattern)
+            const findImagesBlog = await prisma.image_blog.findMany({ where: { blog_id: id } })
+            await findImagesBlog?.map((img: any) => {
+                const deleteImageBlog = async () => {
+                    await prisma.image_blog.delete({ where: { id: img.id } })
+                }
+                deleteImageBlog()
+            })
+            const maxIdImageBlog = await maxId(prisma.image_blog)
+            if (urls && urls.length > 0) await prisma.image_blog.create({
+                data: { file_name: urls[0], blog_id: id, id: maxIdImageBlog }
+            })
 
             return successCode(updateBlog, "Blog updated successfully!")
         } catch (error) {
@@ -209,7 +228,7 @@ export class BlogService {
                 return conditions
             }
 
-            let data = await prisma.blog.findMany({
+            let data: any = await prisma.blog.findMany({
                 where: {
                     OR: [
                         { title: { search: convertTsVector(keySearch) } },
@@ -220,12 +239,12 @@ export class BlogService {
                     AND: generateAndCondition()
                 },
                 include: {
-                    blog_tag: {
-                        include: { tag: true }
-                    },
-                    blog_type_tour: {
-                        include: { type_tour: true }
-                    },
+                    // blog_tag: {
+                    //     include: { tag: true }
+                    // },
+                    // blog_type_tour: {
+                    //     include: { type_tour: true }
+                    // },
                     image_blog: true,
                     user_info: {
                         select: {
@@ -253,7 +272,9 @@ export class BlogService {
                 },
             })
 
-            return successGetPage(data, pageNumber, pageSize, countTotalData)
+            const dataResult = data?.map((el: any) => { return { ...el, content: "..." } })
+
+            return successGetPage(dataResult, pageNumber, pageSize, countTotalData)
         } catch (error) {
             return errorCode(error.message)
         }
