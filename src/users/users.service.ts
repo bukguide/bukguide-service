@@ -131,7 +131,7 @@ export class UsersService {
 
             // Create foreign key
             if (userInfo.language_id) {
-                userInfo.language_id.map((el: any, idx: any) => {
+                for (const el of userInfo.language_id) {
                     const findLanguage = async () => {
                         const maxIdUserLanguage = await maxId(prisma.user_language)
                         let getLanguage = await prisma.language.findFirst({ where: { id: el } })
@@ -139,11 +139,11 @@ export class UsersService {
                             data: { language_id: el, user_id: newUser.id, id: maxIdUserLanguage }
                         })
                     }
-                    findLanguage()
-                })
+                    await findLanguage()
+                }
             }
             if (userInfo.location_id) {
-                userInfo.location_id.map((el: any, idx: any) => {
+                for (const el of userInfo.location_id) {
                     const findLocation = async () => {
                         const maxIdUserLocation = await maxId(prisma.user_location)
                         let getLocation = await prisma.location.findFirst({ where: { id: el } })
@@ -151,11 +151,11 @@ export class UsersService {
                             data: { location_id: el, user_id: newUser.id, id: maxIdUserLocation }
                         })
                     }
-                    findLocation()
-                })
+                    await findLocation()
+                }
             }
             if (userInfo.type_tour_id) {
-                userInfo.type_tour_id.map((el: any, idx: any) => {
+                for (const el of userInfo.type_tour_id) {
                     const findTypeTour = async () => {
                         const maxIdTypeTour = await maxId(prisma.user_type_tour)
                         let getTypeTour = await prisma.type_tour.findFirst({ where: { id: el } })
@@ -163,11 +163,11 @@ export class UsersService {
                             data: { type_tour_id: el, user_id: newUser.id, id: maxIdTypeTour }
                         })
                     }
-                    findTypeTour()
-                })
+                    await findTypeTour()
+                }
             }
             if (userInfo.expertise_id) {
-                userInfo.expertise_id.map((el: any, idx: any) => {
+                for (const el of userInfo.expertise_id) {
                     const findExpertise = async () => {
                         const maxIdUserExpertite = await maxId(prisma.user_expertise)
                         let getExpertise = await prisma.expertise.findFirst({ where: { id: el } })
@@ -175,8 +175,8 @@ export class UsersService {
                             data: { expertise_id: el, user_id: newUser.id, id: maxIdUserExpertite }
                         })
                     }
-                    findExpertise()
-                })
+                    await findExpertise()
+                }
             }
 
             // Send Email
@@ -266,14 +266,13 @@ export class UsersService {
                 let getUserLanguage = await prisma.user_language.findMany({
                     where: { user_id: id }
                 })
-                if (getUserLanguage) await getUserLanguage?.map(el => {
+                if (getUserLanguage) for (const el of getUserLanguage) {
                     const deleteUserLanguage = async () => {
                         await prisma.user_language.delete({ where: { id: el.id } })
                     }
-                    deleteUserLanguage()
-                })
-
-                await userInfo.language_id.map((el: any, idx: any) => {
+                    await deleteUserLanguage()
+                }
+                for (const el of userInfo.language_id) {
                     const findLanguage = async () => {
                         const maxIdUserLanguage = await maxId(prisma.user_language)
                         let getLanguage = await prisma.language.findFirst({ where: { id: el } })
@@ -281,21 +280,20 @@ export class UsersService {
                             data: { language_id: el, user_id: id, id: maxIdUserLanguage }
                         })
                     }
-                    findLanguage()
-                })
+                    await findLanguage()
+                }
             }
             if (userInfo?.location_id /*&& userInfo?.location_id?.length > 0*/) {
                 let getUserLocation = await prisma.user_location.findMany({
                     where: { user_id: id }
                 })
-                if (getUserLocation) await getUserLocation?.map(el => {
+                if (getUserLocation) for (const el of getUserLocation) {
                     const deleteUserLocation = async () => {
                         await prisma.user_location.delete({ where: { id: el.id } })
                     }
-                    deleteUserLocation()
-                })
-
-                await userInfo.location_id.map((el: any, idx: any) => {
+                    await deleteUserLocation()
+                }
+                for (const el of userInfo.location_id) {
                     const findLocation = async () => {
                         const maxIdUserLocation = await maxId(prisma.user_location)
                         let getLocation = await prisma.location.findFirst({ where: { id: el } })
@@ -303,21 +301,20 @@ export class UsersService {
                             data: { location_id: el, user_id: id, id: maxIdUserLocation }
                         })
                     }
-                    findLocation()
-                })
+                    await findLocation()
+                }
             }
             if (userInfo?.type_tour_id /*&& userInfo?.type_tour_id?.length > 0*/) {
                 let getUserTypeTour = await prisma.user_type_tour.findMany({
                     where: { user_id: id }
                 })
-                if (getUserTypeTour) await getUserTypeTour?.map(el => {
+                if (getUserTypeTour) for (const el of getUserTypeTour) {
                     const deleteUserTypeTour = async () => {
                         await prisma.user_type_tour.delete({ where: { id: el.id } })
                     }
-                    deleteUserTypeTour()
-                })
-
-                await userInfo.type_tour_id.map((el: any, idx: any) => {
+                    await deleteUserTypeTour()
+                }
+                for (const el of userInfo.type_tour_id) {
                     const findTypeTour = async () => {
                         const maxIdTypeTour = await maxId(prisma.user_type_tour)
                         let getTypeTour = await prisma.type_tour.findFirst({ where: { id: el } })
@@ -325,21 +322,20 @@ export class UsersService {
                             data: { type_tour_id: el, user_id: id, id: maxIdTypeTour }
                         })
                     }
-                    findTypeTour()
-                })
+                    await findTypeTour()
+                }
             }
             if (userInfo?.expertise_id /*&& userInfo?.expertise_id?.length > 0*/) {
                 let getUserExpertise = await prisma.user_expertise.findMany({
                     where: { user_id: id }
                 })
-                if (getUserExpertise) await getUserExpertise?.map(el => {
+                if (getUserExpertise) for (const el of getUserExpertise) {
                     const deleteUserExpertise = async () => {
                         await prisma.user_expertise.delete({ where: { id: el.id } })
                     }
-                    deleteUserExpertise()
-                })
-
-                await userInfo.expertise_id.map((el: any, idx: any) => {
+                    await deleteUserExpertise()
+                }
+                for (const el of userInfo.expertise_id) {
                     const findExpertise = async () => {
                         const maxIdUserExpertite = await maxId(prisma.user_expertise)
                         let getExpertise = await prisma.expertise.findFirst({ where: { id: el } })
@@ -347,8 +343,8 @@ export class UsersService {
                             data: { expertise_id: el, user_id: id, id: maxIdUserExpertite }
                         })
                     }
-                    findExpertise()
-                })
+                    await findExpertise()
+                }
             }
 
             let token = this.jwtService.sign(
@@ -454,41 +450,42 @@ export class UsersService {
             let getUserLocation = await prisma.user_location.findMany({
                 where: { user_id: id }
             })
-            if (getUserLocation) await getUserLocation?.map(el => {
+            if (getUserLocation) for (const el of getUserLocation) {
                 const deleteUserLocation = async () => {
                     await prisma.user_location.delete({ where: { id: el.id } })
                 }
-                deleteUserLocation()
-            })
+                await deleteUserLocation()
+            }
 
             let getUserLanguage = await prisma.user_language.findMany({
                 where: { user_id: id }
             })
-            if (getUserLanguage) await getUserLanguage?.map(el => {
+            if (getUserLanguage) for (const el of getUserLanguage) {
                 const deleteUserLanguage = async () => {
                     await prisma.user_language.delete({ where: { id: el.id } })
                 }
-                deleteUserLanguage()
-            })
+                await deleteUserLanguage()
+            }
 
             let getUserTypeTour = await prisma.user_type_tour.findMany({
                 where: { user_id: id }
             })
-            if (getUserTypeTour) await getUserTypeTour?.map(el => {
+            if (getUserTypeTour) for (const el of getUserTypeTour) {
                 const deleteUserTypeTour = async () => {
                     await prisma.user_type_tour.delete({ where: { id: el.id } })
                 }
-                deleteUserTypeTour()
-            })
+                await deleteUserTypeTour()
+            }
+
             let getUserExpertise = await prisma.user_expertise.findMany({
                 where: { user_id: id }
             })
-            if (getUserExpertise) await getUserExpertise?.map(el => {
+            if (getUserExpertise) for (const el of getUserExpertise) {
                 const deleteUserExpertise = async () => {
                     await prisma.user_expertise.delete({ where: { id: el.id } })
                 }
-                deleteUserExpertise()
-            })
+                await deleteUserExpertise()
+            }
 
             await prisma.user_info.delete({
                 where: { id },

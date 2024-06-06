@@ -21,13 +21,14 @@ const deleteFileInFolder = (folderPath: any) => {
     })
 }
 
-const maxId = async (table: any) => {
-    const maxId = await table.aggregate({
+async function maxId(table: any): Promise<number> {
+    const maxIdResult = await table.aggregate({
         _max: {
             id: true,
         },
     });
-    return maxId._max.id + 1
+
+    return maxIdResult._max ? maxIdResult._max.id + 1 : 1;
 }
 
 export { convertTsVector, checkPermission, deleteFileInFolder, maxId }

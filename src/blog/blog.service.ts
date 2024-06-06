@@ -30,7 +30,7 @@ export class BlogService {
 
             // Create foreign key
             if (blogData.tag_id) {
-                blogData.tag_id.map((el: any, idx: any) => {
+                for (const el of blogData.tag_id) {
                     const findTag = async () => {
                         const maxIdBlogTag = await maxId(prisma.blog_tag)
                         let getTag = await prisma.tag.findFirst({ where: { id: el } })
@@ -38,11 +38,11 @@ export class BlogService {
                             data: { tag_id: el, blog_id: newBlog.id, id: maxIdBlogTag }
                         })
                     }
-                    findTag()
-                })
+                    await findTag()
+                }
             }
             if (blogData.type_tour_id) {
-                blogData.type_tour_id.map((el: any, idx: any) => {
+                for (const el of blogData.type_tour_id) {
                     const findTypeTour = async () => {
                         const maxIdBlogTypeTour = await maxId(prisma.blog_type_tour)
                         let getTypeTour = await prisma.type_tour.findFirst({ where: { id: el } })
@@ -50,12 +50,12 @@ export class BlogService {
                             data: { type_tour_id: el, blog_id: newBlog.id, id: maxIdBlogTypeTour }
                         })
                     }
-                    findTypeTour()
-                })
+                    await findTypeTour()
+                }
             }
             const urls = blogData.content.match(urlPattern);
             const maxIdImageBlog = await maxId(prisma.image_blog)
-            await prisma.image_blog.create({
+            if (urls && urls.length > 0) await prisma.image_blog.create({
                 data: { file_name: urls[0], blog_id: newBlog.id, id: maxIdImageBlog }
             })
 
@@ -108,14 +108,13 @@ export class BlogService {
                 let getBlogTag = await prisma.blog_tag.findMany({
                     where: { blog_id: id }
                 })
-                if (getBlogTag) await getBlogTag?.map(el => {
+                if (getBlogTag) for (const el of getBlogTag) {
                     const deleteBlogTag = async () => {
                         await prisma.blog_tag.delete({ where: { id: el.id } })
                     }
-                    deleteBlogTag()
-                })
-
-                await blogInfo.tag_id.map((el: any, idx: any) => {
+                    await deleteBlogTag()
+                }
+                for (const el of blogInfo.tag_id) {
                     const findTag = async () => {
                         const maxIdBlogTag = await maxId(prisma.blog_tag)
                         let getTag = await prisma.tag.findFirst({ where: { id: el } })
@@ -123,21 +122,20 @@ export class BlogService {
                             data: { tag_id: el, blog_id: id, id: maxIdBlogTag }
                         })
                     }
-                    findTag()
-                })
+                    await findTag()
+                }
             }
             if (blogInfo?.type_tour_id && blogInfo?.type_tour_id?.length > 0) {
                 let getBlogTypeTour = await prisma.blog_type_tour.findMany({
                     where: { blog_id: id }
                 })
-                if (getBlogTypeTour) await getBlogTypeTour?.map(el => {
+                for (const el of getBlogTypeTour) {
                     const deleteBlogTypeTour = async () => {
                         await prisma.blog_type_tour.delete({ where: { id: el.id } })
                     }
-                    deleteBlogTypeTour()
-                })
-
-                await blogInfo.type_tour_id.map((el: any, idx: any) => {
+                    await deleteBlogTypeTour()
+                }
+                for (const el of blogInfo.type_tour_id) {
                     const findTypeTour = async () => {
                         const maxIdBlogTypeTour = await maxId(prisma.blog_type_tour)
                         let getTypeTour = await prisma.type_tour.findFirst({ where: { id: el } })
@@ -145,17 +143,17 @@ export class BlogService {
                             data: { type_tour_id: el, blog_id: id, id: maxIdBlogTypeTour }
                         })
                     }
-                    findTypeTour()
-                })
+                    await findTypeTour()
+                }
             }
             const urls = blogInfo.content.match(urlPattern)
             const findImagesBlog = await prisma.image_blog.findMany({ where: { blog_id: id } })
-            await findImagesBlog?.map((img: any) => {
+            for (const img of findImagesBlog) {
                 const deleteImageBlog = async () => {
                     await prisma.image_blog.delete({ where: { id: img.id } })
                 }
-                deleteImageBlog()
-            })
+                await deleteImageBlog()
+            }
             const maxIdImageBlog = await maxId(prisma.image_blog)
             if (urls && urls.length > 0) await prisma.image_blog.create({
                 data: { file_name: urls[0], blog_id: id, id: maxIdImageBlog }
