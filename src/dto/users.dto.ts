@@ -31,6 +31,18 @@ export class UserCreateDto {
     created_at: Date;
     updated_at: Date;
 }
+export class UserClientCreateDto {
+    @ApiProperty()
+    name: string;
+    @ApiProperty()
+    email: string;
+    @ApiProperty()
+    number_phone: string;
+    @ApiProperty()
+    password: string;
+    created_at: Date;
+    updated_at: Date;
+}
 export class UserUpdateDto {
     // @ApiProperty()
     // id: number;

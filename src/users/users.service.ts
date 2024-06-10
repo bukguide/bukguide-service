@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { UserCreateDto, UserLoginDto, UserResetPasswordDto, UserUpdateDto } from '../dto/users.dto';
+import { UserClientCreateDto, UserCreateDto, UserLoginDto, UserResetPasswordDto, UserUpdateDto } from '../dto/users.dto';
 import * as bcrypt from 'bcrypt';
 import { errorCode, failCode, successCode, successGetPage } from 'src/config/respone.service';
 import { convertTsVector, maxId } from 'src/ultiService/ultiService';
@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { sendEmailService } from 'src/email/emailService';
 import { use } from 'passport';
+import { log } from 'console';
 
 const prisma = new PrismaClient()
 
@@ -37,7 +38,7 @@ export class UsersService {
                 if (location_id && location_id?.length > 0) conditions.push({ id: { in: findLocation.map(el => el.user_id) } },)
                 if (type_tour_id && type_tour_id?.length > 0) conditions.push({ id: { in: findTypeTour.map(el => el.user_id) } },)
                 if (expertise_id && expertise_id?.length > 0) conditions.push({ id: { in: findExpertise.map(el => el.user_id) } },)
-                // if (permission_id) conditions.push({ permission_id },)
+                if (permission_id) conditions.push({ permission_id: { in: [1, 3] } },)
                 approve === "true" ? conditions.push({ approve: true }) : conditions.push({ approve: false })
 
                 return conditions
@@ -179,6 +180,42 @@ export class UsersService {
                 }
             }
 
+            // Send Email
+            // sendEmailService('login', { userName: userInfo.name }, userInfo.email, 'WELCOME TO BUKGUID.COM')
+
+            return successCode({ userName: newUser.name }, "User created successfully!")
+        } catch (error) {
+            return errorCode(error.message)
+        }
+    }
+
+    async signupClient(userInfo: UserClientCreateDto) {
+        // Check param
+        if (!userInfo.email) return failCode("Email not provided")
+        if (!userInfo.name) return failCode("Name not provided")
+        if (!userInfo.password) return failCode("Password not provided")
+
+        // Check if user already exists
+        let checkEmail = await prisma.user_info.findFirst({ where: { email: userInfo.email } })
+        let checkNumber_phone = await prisma.user_info.findFirst({ where: { number_phone: userInfo.number_phone } })
+
+        if (checkEmail) return failCode("Email already exists!")
+        if (checkNumber_phone) return failCode("Number phone already exists!")
+
+        // HashSync user information
+        const maxIdUser = await maxId(prisma.user_info)
+        let dataUserCreate: any = {
+            ...userInfo,
+            id: maxIdUser,
+            password: bcrypt.hashSync(userInfo.password, 10),
+            created_at: new Date(),
+            updated_at: new Date(),
+            approve: true,
+            permission_id: 4
+        }
+
+        try {
+            let newUser = await prisma.user_info.create({ data: dataUserCreate })
             // Send Email
             // sendEmailService('login', { userName: userInfo.name }, userInfo.email, 'WELCOME TO BUKGUID.COM')
 
@@ -429,6 +466,9 @@ export class UsersService {
                     _count: {
                         select: { blog: true }
                     }
+                },
+                where: {
+                    permission_id: { in: [1, 3] }
                 }
             })
             const dataResult = dataFind?.map((user: any) => {
@@ -517,6 +557,59 @@ export class UsersService {
                 return successCode({ token: token }, "Login successful!")
             } else {
                 return failCode("Passwords incorrect!")
+            }
+        } catch (error) {
+            return errorCode(error.message)
+        }
+    }
+
+    async loginGoogle(userLogin: string) {
+        try {
+            const getToken = Object.keys(userLogin)[0]
+            const userDecode = this.jwtService.decode(getToken);
+
+            let checkUser = await prisma.user_info.findFirst({
+                where: { email: userDecode.email },
+                include: { permission: true }
+            })
+            if (!checkUser) {
+                const maxIdUser = await maxId(prisma.user_info)
+                const newUser: any = {
+                    id: maxIdUser,
+                    name: userDecode.name,
+                    email: userDecode.email,
+                    avatar: userDecode.picture,
+                    password: bcrypt.hashSync(userDecode.sub, 10),
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                    approve: true,
+                    permission_id: 4
+                }
+                let newUserCreate = await prisma.user_info.create({ data: newUser })
+
+                let { password, ...data } = { ...newUserCreate }
+                let token = this.jwtService.sign(
+                    { data: data },
+                    {
+                        expiresIn: '72h',
+                        secret: this.config.get('SECRET_KEY')
+                    }
+                )
+                return successCode({ token: token }, "Login successful!")
+            } else {
+                if (bcrypt.compareSync(userDecode.sub, checkUser.password)) {
+                    let { password, ...data } = { ...checkUser }
+                    let token = this.jwtService.sign(
+                        { data: data },
+                        {
+                            expiresIn: '72h',
+                            secret: this.config.get('SECRET_KEY')
+                        }
+                    )
+                    return successCode({ token: token }, "Login successful!")
+                } else {
+                    return failCode("Passwords incorrect!")
+                }
             }
         } catch (error) {
             return errorCode(error.message)

@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Headers, HttpCode, HttpException, HttpStatus, Param, Post, Query, Req, UseGuards, } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UserCreateDto, UserLoginDto, UserResetPasswordDto, UserUpdateDto } from '../dto/users.dto';
+import { UserClientCreateDto, UserCreateDto, UserLoginDto, UserResetPasswordDto, UserUpdateDto } from '../dto/users.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { checkPermission } from 'src/ultiService/ultiService';
@@ -18,9 +18,19 @@ export class UsersController {
         return this.UsersService.signup(UserInfo)
     }
 
+    @Post('signup-client')
+    signupClient(@Body() UserInfo: UserClientCreateDto) {
+        return this.UsersService.signupClient(UserInfo)
+    }
+
     @Post('login')
     login(@Body() UserLogin: UserLoginDto) {
         return this.UsersService.login(UserLogin)
+    }
+
+    @Post('login-google')
+    loginGoogle(@Body() UserLogin: string) {
+        return this.UsersService.loginGoogle(UserLogin)
     }
 
     @ApiBearerAuth()
