@@ -8,8 +8,8 @@ RUN npm install --force
 
 COPY . .
 
-# RUN npm cache clean --force
-# RUN npm install prisma
+RUN npm cache clean --force
+RUN npm install prisma
 RUN npx prisma generate
 
 EXPOSE 3000 80
