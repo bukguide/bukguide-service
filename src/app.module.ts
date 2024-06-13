@@ -11,6 +11,9 @@ import { PermissionModule } from './categories/permission/permission.module';
 import { ExpertiseModule } from './categories/expertise/expertise.module';
 import { TypeTourModule } from './categories/type-toure/type-tour.module';
 import { UploadModule } from './upload/upload.module';
+import { ChatGateway } from './chat/chat.gateway';
+import { ChatModule } from './chat/chat.module';
+import { ChatService } from './chat/chat.service';
 
 @Module({
   imports: [
@@ -26,8 +29,9 @@ import { UploadModule } from './upload/upload.module';
     PermissionModule,
     ExpertiseModule,
     UploadModule,
+    ChatModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ChatGateway, ChatService],
 })
 export class AppModule { }

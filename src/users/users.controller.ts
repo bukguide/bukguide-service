@@ -23,6 +23,11 @@ export class UsersController {
         return this.UsersService.signupClient(UserInfo)
     }
 
+    @Post('signup-client-google')
+    signupGoogle(@Body() UserInfo: string) {
+        return this.UsersService.signupGoogle(UserInfo)
+    }
+
     @Post('login')
     login(@Body() UserLogin: UserLoginDto) {
         return this.UsersService.login(UserLogin)

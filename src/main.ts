@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express';
-import * as path from 'path'; // Thêm vào để sử dụng path module
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

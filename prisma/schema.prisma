@@ -37,6 +37,18 @@ model blog_type_tour {
   type_tour    type_tour @relation(fields: [type_tour_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "blog_type_toure_type_toure_id_fkey")
 }
 
+model chat_message {
+  id                                          Int       @id @default(autoincrement())
+  user1_id                                    Int
+  user2_id                                    Int
+  user_send                                   Int
+  time                                        DateTime  @db.Timestamp(6)
+  message                                     String
+  user_info_chat_message_user1_idTouser_info  user_info @relation("chat_message_user1_idTouser_info", fields: [user1_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_info_chat_message_user2_idTouser_info  user_info @relation("chat_message_user2_idTouser_info", fields: [user2_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_info_chat_message_user_sendTouser_info user_info @relation("chat_message_user_sendTouser_info", fields: [user_send], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
 model expertise {
   id             Int              @id @default(autoincrement())
   name           String
@@ -90,25 +102,28 @@ model user_expertise {
 }
 
 model user_info {
-  id             Int              @id @default(autoincrement())
-  name           String?
-  emirates_id    String?
-  license_no     String?          @db.VarChar
-  expiry_date    DateTime?        @db.Date
-  permission_id  Int
-  email          String?          @db.VarChar
-  number_phone   String?          @db.VarChar
-  created_at     DateTime?        @db.Timestamp(6)
-  updated_at     DateTime?        @db.Timestamp(6)
-  password       String?
-  approve        Boolean?
-  avatar         String?
-  blog           blog[]
-  user_expertise user_expertise[]
-  permission     permission       @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user_language  user_language[]
-  user_location  user_location[]
-  user_type_tour user_type_tour[]
+  id                                             Int              @id @default(autoincrement())
+  name                                           String?
+  emirates_id                                    String?
+  license_no                                     String?          @db.VarChar
+  expiry_date                                    DateTime?        @db.Date
+  permission_id                                  Int
+  email                                          String?          @db.VarChar
+  number_phone                                   String?          @db.VarChar
+  created_at                                     DateTime?        @db.Timestamp(6)
+  updated_at                                     DateTime?        @db.Timestamp(6)
+  password                                       String?
+  approve                                        Boolean?
+  avatar                                         String?
+  blog                                           blog[]
+  chat_message_chat_message_user1_idTouser_info  chat_message[]   @relation("chat_message_user1_idTouser_info")
+  chat_message_chat_message_user2_idTouser_info  chat_message[]   @relation("chat_message_user2_idTouser_info")
+  chat_message_chat_message_user_sendTouser_info chat_message[]   @relation("chat_message_user_sendTouser_info")
+  user_expertise                                 user_expertise[]
+  permission                                     permission       @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_language                                  user_language[]
+  user_location                                  user_location[]
+  user_type_tour                                 user_type_tour[]
 }
 
 model user_language {

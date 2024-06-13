@@ -7,8 +7,6 @@ import { convertTsVector, maxId } from 'src/ultiService/ultiService';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { sendEmailService } from 'src/email/emailService';
-import { use } from 'passport';
-import { log } from 'console';
 
 const prisma = new PrismaClient()
 
@@ -184,6 +182,38 @@ export class UsersService {
             // sendEmailService('login', { userName: userInfo.name }, userInfo.email, 'WELCOME TO BUKGUID.COM')
 
             return successCode({ userName: newUser.name }, "User created successfully!")
+        } catch (error) {
+            return errorCode(error.message)
+        }
+    }
+
+
+    async signupGoogle(userSignup: string) {
+        try {
+            const getToken = Object.keys(userSignup)[0]
+            const userDecode = this.jwtService.decode(getToken);
+
+            let checkUser = await prisma.user_info.findFirst({
+                where: { email: userDecode.email },
+                include: { permission: true }
+            })
+            if (!checkUser) {
+                const maxIdUser = await maxId(prisma.user_info)
+                const newUser: any = {
+                    id: maxIdUser,
+                    name: userDecode.name,
+                    email: userDecode.email,
+                    avatar: userDecode.picture,
+                    password: bcrypt.hashSync(userDecode.sub, 10),
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                    approve: true,
+                    permission_id: 4
+                }
+                let newUserCreate = await prisma.user_info.create({ data: newUser })
+
+                return successCode({ userName: newUserCreate.email }, "User created successfully!")
+            } else return failCode("Email account has been registered!")
         } catch (error) {
             return errorCode(error.message)
         }
@@ -542,8 +572,8 @@ export class UsersService {
                 where: { email: userLogin.email },
                 include: { permission: true }
             })
-            if (!checkUser) return failCode("Email not found!")
-            if (!checkUser.approve) return failCode("Your account has not been approved, please wait for the moderation email")
+            if (!checkUser) return failCode({ type: "EmailNotFound", message: "Your email account has not been registered yet!" })
+            if (!checkUser.approve) return failCode({ type: "AccountNotApproved", message: "Your account has not been approved, please wait for the moderation email" })
 
             if (bcrypt.compareSync(userLogin.password, checkUser.password)) {
                 let { password, ...data } = { ...checkUser }
@@ -556,7 +586,7 @@ export class UsersService {
                 )
                 return successCode({ token: token }, "Login successful!")
             } else {
-                return failCode("Passwords incorrect!")
+                return failCode({ type: "PasswordsIncorrect", message: "Passwords incorrect!" })
             }
         } catch (error) {
             return errorCode(error.message)
@@ -573,29 +603,7 @@ export class UsersService {
                 include: { permission: true }
             })
             if (!checkUser) {
-                const maxIdUser = await maxId(prisma.user_info)
-                const newUser: any = {
-                    id: maxIdUser,
-                    name: userDecode.name,
-                    email: userDecode.email,
-                    avatar: userDecode.picture,
-                    password: bcrypt.hashSync(userDecode.sub, 10),
-                    created_at: new Date(),
-                    updated_at: new Date(),
-                    approve: true,
-                    permission_id: 4
-                }
-                let newUserCreate = await prisma.user_info.create({ data: newUser })
-
-                let { password, ...data } = { ...newUserCreate }
-                let token = this.jwtService.sign(
-                    { data: data },
-                    {
-                        expiresIn: '72h',
-                        secret: this.config.get('SECRET_KEY')
-                    }
-                )
-                return successCode({ token: token }, "Login successful!")
+                return failCode({ type: "EmailNotFound", message: "Your email account has not been registered yet!" })
             } else {
                 if (bcrypt.compareSync(userDecode.sub, checkUser.password)) {
                     let { password, ...data } = { ...checkUser }
