@@ -8,7 +8,7 @@ import { errorCode } from 'src/config/respone.service';
 
 const prisma = new PrismaClient()
 
-@WebSocketGateway({ namespace: '/chat', cors: [/*'http://localhost/'*/, 'https://bukguide.com/'] })
+@WebSocketGateway({ namespace: '/chat', cors: true})
 export class ChatGateway {
   constructor(
     private readonly ChatService: ChatService
