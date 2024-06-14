@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,9 +17,14 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swg', app, document);
 
-  app.enableCors({
-    origin: true,
-  });
+  const corsOptions: CorsOptions = {
+    origin: ['http://localhost', /*'https://bukguide.com/'*/], // Danh sách các domain được phép
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Accept',
+    credentials: true,
+  };
+
+  app.enableCors(corsOptions);
   app.setGlobalPrefix('api');
 
   app.use('/image', express.static('public')); // Đường dẫn tới thư mục public
