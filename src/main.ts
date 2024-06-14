@@ -6,11 +6,11 @@ import * as fs from 'fs';
 import { log } from 'console';
 
 async function bootstrap() {
-  const httpsOptions = {
-    key: fs.readFileSync('./ssl-key/private-key.pem'),
-    cert: fs.readFileSync('./ssl-key/certificate.pem'),
-  };
-  const app = await NestFactory.create(AppModule, { httpsOptions });
+  // const httpsOptions = {
+  //   key: fs.readFileSync('./ssl-key/private-key.pem'),
+  //   cert: fs.readFileSync('./ssl-key/certificate.pem'),
+  // };
+  const app = await NestFactory.create(AppModule, /*{ httpsOptions }*/);
 
   const config = new DocumentBuilder()
     .setTitle('BukGuide.com Documentation')
