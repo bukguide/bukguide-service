@@ -26,7 +26,7 @@ export class ChatService {
             },
             distinct: ['user1_id', 'user2_id'],
             orderBy: {
-                time: 'desc',
+                time: "desc",
             },
         });
         if (result.length > 0) {

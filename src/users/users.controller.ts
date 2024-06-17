@@ -5,6 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { checkPermission } from 'src/ultiService/ultiService';
 import { unAuthor } from 'src/config/respone.service';
+import { log } from 'console';
 
 @ApiTags("UsersService")
 @Controller('users')
@@ -70,7 +71,7 @@ export class UsersController {
         @Query("pageNumber") pageNumber: string,
         @Query("pageSize") pageSize: string,
         @Query("approve") approve: boolean,
-        @Query("permission_id") permission_id: number,
+        @Query("permission_id") permission_id: number[],
         @Query("language_id") language_id: number[],
         @Query("location_id") location_id: number[],
         @Query("type_tour_id") type_tour_id: number[],
@@ -83,7 +84,7 @@ export class UsersController {
                 parseInt(pageNumber),
                 parseInt(pageSize),
                 approve.toString(),
-                permission_id * 1,
+                permission_id ? JSON.parse(permission_id.toString()) : [],
                 language_id ? JSON.parse(language_id.toString()) : [],
                 location_id ? JSON.parse(location_id.toString()) : [],
                 type_tour_id ? JSON.parse(type_tour_id.toString()) : [],
@@ -107,10 +108,10 @@ export class UsersController {
 
     @HttpCode(201)
     @Get('get-option')
-    getOption(@Req() req) {
+    getOption(@Req() req, @Query("permission_id") permission_id: number[]) {
         try {
             // if (!checkPermission(req, ["admin", "Tourguide"])) return unAuthor()
-            return this.UsersService.getOption()
+            return this.UsersService.getOption(permission_id ? JSON.parse(permission_id.toString()) : [])
         } catch (error) {
             throw new HttpException("Error Server", HttpStatus.INTERNAL_SERVER_ERROR)
         }

@@ -1,10 +1,10 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { PrismaClient } from '@prisma/client';
-import { log } from 'console';
 import { Server, Socket } from 'socket.io';
 import { maxId } from 'src/ultiService/ultiService';
 import { ChatService } from './chat.service';
-import { errorCode } from 'src/config/respone.service';
+import { errorCode, successCode } from 'src/config/respone.service';
+import { log } from 'console';
 
 const prisma = new PrismaClient()
 
@@ -87,15 +87,17 @@ export class ChatGateway {
       dataCreate.user1_id = sendFrom
       dataCreate.user2_id = sendTo
     }
-    const dataNew = await prisma.chat_message.create({ data: dataCreate })
+    const dataNew: any = await prisma.chat_message.create({ data: dataCreate })
     const recipientSocketId = this.users.get(sendTo);
 
     if (recipientSocketId) {
       this.server.to(recipientSocketId).emit('message', dataNew);
+      this.server.to(recipientSocketId).emit('getConvertsations', successCode([dataNew], "success"));
     } else {
       console.log(`User ${recipientSocketId} is not connected`);
     }
     this.server.to(client.id).emit('message', dataNew);
+    this.server.to(client.id).emit('getConvertsations', successCode([dataNew], "success"));
     return 'Hello world!';
   }
 }

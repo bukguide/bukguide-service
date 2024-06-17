@@ -7,6 +7,7 @@ import { convertTsVector, maxId } from 'src/ultiService/ultiService';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { sendEmailService } from 'src/email/emailService';
+import { log } from 'console';
 
 const prisma = new PrismaClient()
 
@@ -18,31 +19,63 @@ export class UsersService {
         pageNumber: number,
         pageSize: number,
         approve: string,
-        permission_id: number,
+        permission_id: number[],
         language_id: number[],
         location_id: number[],
         type_tour_id: number[],
         expertise_id: number[],
     ) {
         try {
-            let findLanguage = await prisma.user_language.findMany({ where: { language_id: { in: language_id } } })
-            let findLocation = await prisma.user_location.findMany({ where: { location_id: { in: location_id } } })
-            let findTypeTour = await prisma.user_type_tour.findMany({ where: { type_tour_id: { in: type_tour_id } } })
-            let findExpertise = await prisma.user_expertise.findMany({ where: { expertise_id: { in: expertise_id } } })
-
+            // let findLanguage = await prisma.user_language.findMany({ where: { language_id: { in: language_id } } })
+            // let findLocation = await prisma.user_location.findMany({ where: { location_id: { in: location_id } } })
+            // let findTypeTour = await prisma.user_type_tour.findMany({ where: { type_tour_id: { in: type_tour_id } } })
+            // let findExpertise = await prisma.user_expertise.findMany({ where: { expertise_id: { in: expertise_id } } })
             const generateAndCondition = () => {
                 const conditions = [];
-                if (language_id && language_id?.length > 0) conditions.push({ id: { in: findLanguage.map(el => el.user_id) } },)
-                if (location_id && location_id?.length > 0) conditions.push({ id: { in: findLocation.map(el => el.user_id) } },)
-                if (type_tour_id && type_tour_id?.length > 0) conditions.push({ id: { in: findTypeTour.map(el => el.user_id) } },)
-                if (expertise_id && expertise_id?.length > 0) conditions.push({ id: { in: findExpertise.map(el => el.user_id) } },)
-                if (permission_id) conditions.push({ permission_id: { in: [1, 3] } },)
+                if (language_id && language_id?.length > 0) conditions.push({
+                    user_language: {
+                        some: {
+                            language_id: {
+                                in: language_id
+                            }
+                        }
+                    }
+                })
+                if (location_id && location_id?.length > 0) conditions.push({
+                    user_location: {
+                        some: {
+                            location_id: {
+                                in: location_id
+                            }
+                        }
+                    }
+                })
+                if (type_tour_id && type_tour_id?.length > 0) conditions.push({
+                    user_type_tour: {
+                        some: {
+                            type_tour_id: {
+                                in: type_tour_id
+                            }
+                        }
+                    }
+                })
+                if (expertise_id && expertise_id?.length > 0) conditions.push({
+                    user_expertise: {
+                        some: {
+                            expertise_id: {
+                                in: expertise_id
+                            }
+                        }
+                    }
+                })
+                if (permission_id && permission_id?.length > 0) conditions.push({
+                    permission_id: { in: permission_id }
+                })
                 approve === "true" ? conditions.push({ approve: true }) : conditions.push({ approve: false })
-
                 return conditions
             }
 
-
+            log(language_id)
             let data = await prisma.user_info.findMany({
                 where: {
                     OR: [
@@ -186,7 +219,6 @@ export class UsersService {
             return errorCode(error.message)
         }
     }
-
 
     async signupGoogle(userSignup: string) {
         try {
@@ -489,7 +521,7 @@ export class UsersService {
         }
     }
 
-    async getOption() {
+    async getOption(permission_id: number[]) {
         try {
             let dataFind = await prisma.user_info.findMany({
                 include: {
@@ -498,7 +530,7 @@ export class UsersService {
                     }
                 },
                 where: {
-                    permission_id: { in: [1, 3] }
+                    permission_id: { in: permission_id }
                 }
             })
             const dataResult = dataFind?.map((user: any) => {
