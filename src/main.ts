@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express';
 import * as fs from 'fs';
 import { log } from 'console';
+import dotenv from 'dotenv';
 
 async function bootstrap() {
   // const httpsOptions = {
@@ -28,6 +29,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.use('/image', express.static('public')); // Đường dẫn tới thư mục public
+  // dotenv.config(); 
 
   await app.listen(3000);
 }

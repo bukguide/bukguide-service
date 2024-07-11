@@ -5,6 +5,8 @@ import { maxId } from 'src/ultiService/ultiService';
 import { ChatService } from './chat.service';
 import { errorCode, successCode } from 'src/config/respone.service';
 import { log } from 'console';
+import { discordSendMessage } from 'src/discord/discordService';
+import axios from 'axios';
 
 const prisma = new PrismaClient()
 
@@ -89,6 +91,8 @@ export class ChatGateway {
     }
     const dataNew: any = await prisma.chat_message.create({ data: dataCreate })
     const recipientSocketId = this.users.get(sendTo);
+
+    await discordSendMessage(dataNew.message)
 
     if (recipientSocketId) {
       this.server.to(recipientSocketId).emit('message', dataNew);
